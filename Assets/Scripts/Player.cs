@@ -124,8 +124,11 @@ public class Player : MonoBehaviour
             rigid.velocity = Vector3.zero; // 없으면 캐릭터가 공격중 착지했을때에 이동이 가능한데 모션이 이상함...
             isJump = false;
             anim.SetBool("IsJump", isJump);
-            jumpNum = 0;
-            jumpVec = Vector3.zero;
+            if (collision.contacts[0].point.y <= (transform.position.y + 0.1f))
+            {
+                jumpNum = 0;
+                jumpVec = Vector3.zero;
+            }
         }
     }
     private void OnCollisionStay2D(Collision2D collision)
