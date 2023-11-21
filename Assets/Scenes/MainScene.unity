@@ -2332,6 +2332,7 @@ MonoBehaviour:
   potionNumTxt: {fileID: 791322452}
   RollCoolImg: {fileID: 1252413812}
   inputManager: {fileID: 457140844}
+  saveTxt: {fileID: 1210818443}
 --- !u!4 &885497748
 Transform:
   m_ObjectHideFlags: 0

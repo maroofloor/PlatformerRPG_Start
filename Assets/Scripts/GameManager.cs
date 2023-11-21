@@ -17,6 +17,8 @@ public class GameManager : Singleton<GameManager>
     Image RollCoolImg;
     float rollMaxCool = 3f;
     public InputManager inputManager;
+    [SerializeField]
+    Text saveTxt;
 
     void Update()
     {
