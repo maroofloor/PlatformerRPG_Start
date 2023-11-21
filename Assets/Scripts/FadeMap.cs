@@ -5,8 +5,8 @@ using UnityEngine;
 public class FadeMap : MonoBehaviour
 {
     SpriteRenderer spriter;
-    float alpha;
     Vector4 colorVec;
+
     void Start()
     {
         spriter = GetComponent<SpriteRenderer>();
@@ -21,6 +21,7 @@ public class FadeMap : MonoBehaviour
             colorVec.w = 0f;
         else if (GameManager.Instance.player.transform.position.x > 41f)
             colorVec.w = 1f;
-            spriter.color = colorVec;
+
+        spriter.color = colorVec;
     }
 }

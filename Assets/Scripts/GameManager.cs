@@ -17,8 +17,7 @@ public class GameManager : Singleton<GameManager>
     Image RollCoolImg;
     float rollMaxCool = 3f;
     public InputManager inputManager;
-    [SerializeField]
-    Text saveTxt;
+    
 
     void Update()
     {
@@ -31,7 +30,10 @@ public class GameManager : Singleton<GameManager>
     void FixedUpdate()
     {
         playerHPBar.fillAmount = player.myStat.HP / player.myStat.MaxHP;
-
-
     }
+
+    public void SAVEButtonClicked()
+    {
+    }
+    
 }
