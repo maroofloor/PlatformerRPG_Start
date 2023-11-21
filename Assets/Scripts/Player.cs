@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     Animator anim;
-    Rigidbody2D rigid;
+    Rigidbody2D rigid;    
 
     public float rollCool;
     Coroutine rollCor = null;
@@ -15,7 +15,9 @@ public class Player : MonoBehaviour
     Vector3 jumpVec = Vector3.zero;
     Vector3 rollVec = Vector3.zero;
 
-    public AllStruct.Stat myStat;
+    public AllStruct.Stat myStat; // 플레이어의 스탯(구조체)... scripts폴더에 AllStruct스크립트...
+
+    public int potionNum; // 플레이어가 소유한 포션의 개수
 
     bool isMove => vec.x != 0f; // vec.x가 0이 아니라면 플레이어가 이동키를 입력중...
     public bool isLeft;
@@ -31,6 +33,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+        potionNum = 0;
         rollCool = 0f;
         anim = GetComponent<Animator>();
         rigid = GetComponent<Rigidbody2D>();
@@ -46,12 +49,14 @@ public class Player : MonoBehaviour
         {
             jumpNum++;
             if (vec.x != 0)
+            {
                 scaleVec.x = vec.x;
 
-            if (vec.x < 0)
-                isLeft = true;
-            else
-                isLeft = false;
+                if (vec.x < 0)
+                    isLeft = true;
+                else
+                    isLeft = false;
+            }
 
             transform.localScale = scaleVec;
             jumpVec = new Vector3(vec.x, 1f, 0);
@@ -63,12 +68,14 @@ public class Player : MonoBehaviour
         if (attackNum < 2 && !isRoll && isAlive)
         {
             if (vec.x != 0)
+            {
                 scaleVec.x = vec.x;
 
-            if (vec.x < 0)
-                isLeft = true;
-            else
-                isLeft = false;
+                if (vec.x < 0)
+                    isLeft = true;
+                else
+                    isLeft = false;
+            }
 
             transform.localScale = scaleVec;
 
@@ -83,10 +90,14 @@ public class Player : MonoBehaviour
         if (!isAttack1 && !isAttack2 && !isRoll && !isJump && isAlive && rollCool <= 0f)
             StartCoroutine(PlayRoll());
     }
+    //public void Move(float dir)
+    //{
+
+    //}
 
     void Update()
     {
-        vec.x = Input.GetAxisRaw("Horizontal");
+        //vec.x = Input.GetAxisRaw("Horizontal");
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -114,7 +125,10 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         if (isAlive && !isAttack1 && !isAttack2 && !isRoll && !isJump)// 공격중, 회피중에 이동 할 수 없음
-            transform.Translate(vec.normalized * Time.fixedDeltaTime * speed); // 캐릭터의 이동
+        transform.Translate(vec.normalized * Time.fixedDeltaTime * speed); // 캐릭터의 이동
+
+        //if (isAlive && !isAttack1 && !isAttack2 && !isRoll && !isJump)// 공격중, 회피중에 이동 할 수 없음
+        //    transform.Translate(vec.normalized * Time.fixedDeltaTime * speed); // 캐릭터의 이동
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -162,7 +176,7 @@ public class Player : MonoBehaviour
         {
             anim.SetTrigger("IsAttack2");
             isAttack2 = true;
-            yield return new WaitForSeconds(0.6f);
+            yield return new WaitForSeconds(0.5f);
             isAttack2 = false;
 
             if (attackNum >= 2)
