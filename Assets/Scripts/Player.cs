@@ -28,8 +28,14 @@ public class Player : MonoBehaviour
     bool isAlive => myStat.HP > 0; // HP가 0보다 크면 살아있음
 
     int attackNum = 0; // 공격콤보
-    public int jumpNum = 0; // 점프 횟수
+    int jumpNum = 0; // 점프 횟수
     float speed = 6; // 플레이어 속도
+
+    [SerializeField]
+    int enforceVal;
+    float[] enforceAtt = new float[11] { 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 600 };
+    float[] enforceDef = new float[11] { 0, 2, 6, 12, 20, 30, 42, 56, 72, 90, 550 };
+    float[] enforceHP = new float[11] { 100, 200, 330, 490, 680, 900, 1150, 1440, 1770, 2140, 3000 };
 
     void Start()
     {
@@ -40,7 +46,8 @@ public class Player : MonoBehaviour
         isAttack1 = false;
         isAttack2 = false;
         isRoll = false;
-        myStat = new AllStruct.Stat(100, 10); // 일단 체력100, 공격력 10으로 시작
+        myStat = new AllStruct.Stat(enforceHP[0], enforceAtt[0], enforceDef[0]);
+        enforceVal = 0;
     }
 
     public void Jump()
@@ -138,7 +145,7 @@ public class Player : MonoBehaviour
             rigid.velocity = Vector3.zero; // 없으면 캐릭터가 공격중 착지했을때에 이동이 가능한데 모션이 이상함...
             isJump = false;
             anim.SetBool("IsJump", isJump);
-            if (collision.contacts[0].point.y <= (transform.position.y + 0.1f))
+            if (collision.contacts[0].point.y <= (transform.position.y + 0.2f))
             {
                 jumpNum = 0;
                 jumpVec = Vector3.zero;
@@ -215,5 +222,57 @@ public class Player : MonoBehaviour
         }
         StopCoroutine(rollCor);
         rollCor = null;
+    }
+
+    public void EnforceStat(int enforceNum)
+    {
+        AllEnum.EnforceType enforceType = (AllEnum.EnforceType)enforceNum;
+        if (enforceVal > 0)
+        {
+            switch (enforceType)
+            {
+                case AllEnum.EnforceType.Attack:
+                    for (int i = 0; i < enforceAtt.Length; i++)
+                    {
+                        if (myStat.Att < enforceAtt[i] && i != 0)
+                        {
+                            myStat.Att = enforceAtt[i];
+                            enforceVal--;
+                            UIManager.Instance.PrintWarningMsg($"강화 수치를 사용하여 공격력을 강화 합니다.\n{enforceAtt[i-1]} -> {enforceAtt[i]}");
+                            return;
+                        }
+                    }
+                    break;
+                case AllEnum.EnforceType.Defense:
+                    for (int i = 0; i < enforceDef.Length; i++)
+                    {
+                        if (myStat.Def < enforceDef[i] && i != 0)
+                        {
+                            myStat.Def = enforceDef[i];
+                            enforceVal--;
+                            UIManager.Instance.PrintWarningMsg($"강화 수치를 사용하여 방어력을 강화 합니다.\n{enforceDef[i - 1]} -> {enforceDef[i]}");
+                            return;
+                        }
+                    }
+                    break;
+                case AllEnum.EnforceType.MaxHP:
+                    for (int i = 0; i < enforceHP.Length; i++)
+                    {
+                        if (myStat.MaxHP < enforceHP[i] && i != 0)
+                        {
+                            myStat.MaxHP = enforceHP[i];
+                            myStat.HP += enforceHP[i] - enforceHP[i - 1]; // 증가한 값 만큼 HP에 더하기
+                            enforceVal--;
+                            UIManager.Instance.PrintWarningMsg($"강화 수치를 사용하여 최대체력을 강화 합니다.\n{enforceHP[i - 1]} -> {enforceHP[i]}");
+                            return;
+                        }
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            UIManager.Instance.PrintWarningMsg("강화개수가 부족하여 강화할 수 없습니다.");
+        }        
     }
 }

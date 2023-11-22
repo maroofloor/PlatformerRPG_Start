@@ -7,7 +7,7 @@ public class AllStruct
         public float Att; // 공격력
         public float Def; // 방어력        
 
-        public Stat(int hp, int att, int def = 0) // 방어력은 수치를 넣지 않으면 0으로 설정
+        public Stat(float hp, float att, float def = 0f) // 방어력은 수치를 넣지 않으면 0으로 설정
         {
             HP = hp;
             MaxHP = hp;

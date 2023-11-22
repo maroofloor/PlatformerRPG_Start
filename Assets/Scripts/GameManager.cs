@@ -17,15 +17,18 @@ public class GameManager : Singleton<GameManager>
     Image RollCoolImg;
     float rollMaxCool = 3f;
     public InputManager inputManager;
-    
 
+    private void Start()
+    {
+        player.gameObject.SetActive(true);
+    }
     void Update()
     {
         RollCoolImg.fillAmount = player.rollCool / rollMaxCool;
     }
     private void LateUpdate()
     {
-        potionNumTxt.text = "x " + string.Format("{0:00}",GameManager.Instance.player.potionNum);
+        potionNumTxt.text = "x " + string.Format("{0:00}",player.potionNum);
     }
     void FixedUpdate()
     {
