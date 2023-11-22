@@ -8,9 +8,12 @@ public class Monster : MonoBehaviour
     Animator anim;
     Vector3 movement;
     Rigidbody2D rigid;
-    int moveFlag = 0; // 0 정지 1 왼쪽 2 오른쪽
+    int moveFlag = 0;
+    int attFlag = 0;
+   
     public AllStruct.Stat enemy_stat;
     Player player;
+
     
     [SerializeField]
     Slider HPBar;
@@ -29,10 +32,11 @@ public class Monster : MonoBehaviour
     {
         while(true)
         {
-            moveFlag = Random.Range(0, 3);
+            moveFlag = Random.Range(-1, 2);
             if (moveFlag == 0)
             {
                 anim.SetBool("Walk", false);
+                attFlag = 1;
             }
             else
             {
@@ -49,25 +53,47 @@ public class Monster : MonoBehaviour
         Move();        
         StartCoroutine(Hit());        
     }
-   
+    void FixedUpdate()
+    {
+        //낭떠러지 앞에서 방향 전환
+        Vector2 frontVec = new Vector2(rigid.position.x + moveFlag * 0.5f, rigid.position.y);        
+        Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));          
+        RaycastHit2D rayHit = Physics2D.Raycast(frontVec, Vector3.down, 1, LayerMask.GetMask("Ground"));
+        if (rayHit.collider == null)
+        {
+           moveFlag = moveFlag * (-1);
+        }
+
+        //공격범위
+        Vector2 e_attack = new Vector2(rigid.position.x + attFlag, rigid.position.y);
+        Debug.DrawRay(e_attack, Vector3.down, new Color(1, 0, 0));
+        RaycastHit2D attHit = Physics2D.Raycast(frontVec, Vector3.down, 1, LayerMask.GetMask("Player"));
+        if (attHit.collider != null)
+        {
+            Debug.Log("공격"); // 공격 애니메이션 + 플레이어 데미지로 바꿀 예정
+        }
+
+    }
+
 
     void Move()
     {
         Vector3 movevelocity = Vector3.zero;
-        if (moveFlag == 1) 
+        if (moveFlag == -1) 
         { 
             movevelocity = Vector3.left;
             transform.localScale = new Vector3(-5, 5, 1);
             rigid.velocity = new Vector2(-1, rigid.velocity.y) * movepower; 
             HPBar.transform.localScale = new Vector3(-0.02f, 0.02f, 1);
-
+            attFlag = -1;
         }
-        else if (moveFlag == 2)
+        else if (moveFlag == 1)
         {
             movevelocity = Vector3.right;
             transform.localScale = new Vector3(5, 5, 1);
             rigid.velocity = new Vector2(1, rigid.velocity.y) * movepower;
             HPBar.transform.localScale = new Vector3(0.02f, 0.02f, 1);
+            attFlag = 1;
         }
        
         
@@ -90,5 +116,14 @@ public class Monster : MonoBehaviour
                 Destroy(gameObject); // HP = 0일시 없어짐
             }
         }
+    }
+    IEnumerator Attack()
+    {
+        while (true)
+        {
+            
+            yield return new WaitForSeconds(2f);
+        }
+        
     }
 }
