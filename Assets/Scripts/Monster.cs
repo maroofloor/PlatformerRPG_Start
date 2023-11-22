@@ -2,9 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
-
-
 public class Monster : MonoBehaviour
 {    
     public float movepower = 1f;
@@ -15,16 +12,14 @@ public class Monster : MonoBehaviour
     public AllStruct.Stat enemy_stat;
     Player player;
     
-
     [SerializeField]
     Slider HPBar;
-    
+   
     void Start()
     {
         enemy_stat = new AllStruct.Stat(500,50); // 몬스터 스탯 임시로 적용
         HPBar.maxValue = enemy_stat.MaxHP;
-        HPBar.value = enemy_stat.HP;
-
+        HPBar.value = enemy_stat.HP;        
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         StartCoroutine(Changemovement());       
@@ -52,7 +47,7 @@ public class Monster : MonoBehaviour
     void Update()
     {
         Move();        
-        StartCoroutine(Hit());
+        StartCoroutine(Hit());        
     }
    
 
@@ -63,14 +58,16 @@ public class Monster : MonoBehaviour
         { 
             movevelocity = Vector3.left;
             transform.localScale = new Vector3(-5, 5, 1);
-            rigid.velocity = new Vector2(-1, rigid.velocity.y) * movepower;      
+            rigid.velocity = new Vector2(-1, rigid.velocity.y) * movepower; 
+            HPBar.transform.localScale = new Vector3(-0.02f, 0.02f, 1);
 
         }
         else if (moveFlag == 2)
         {
             movevelocity = Vector3.right;
             transform.localScale = new Vector3(5, 5, 1);
-            rigid.velocity = new Vector2(1, rigid.velocity.y) * movepower;      
+            rigid.velocity = new Vector2(1, rigid.velocity.y) * movepower;
+            HPBar.transform.localScale = new Vector3(0.02f, 0.02f, 1);
         }
        
         
