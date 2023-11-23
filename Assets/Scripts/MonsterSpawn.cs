@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MonsterSpawn : MonoBehaviour
-{   
+{
     public GameObject Enemy;
-    int count = 5; //몬스터 마릿수
+    [SerializeField]
+    int count = 0; //몬스터 마릿수
     
     private BoxCollider2D area;
     private List<GameObject> MonsterList = new List<GameObject>();
@@ -13,27 +14,28 @@ public class MonsterSpawn : MonoBehaviour
     void Start()
     {        
         area = GetComponent<BoxCollider2D>();
-        StartCoroutine("Spawn", 30); 
+        StartCoroutine("Spawn", 60); 
     }
     
     private IEnumerator Spawn(float delayTime)
     {
-
-        for (int i = 0; i < count; i++) 
+        while (true)
         {
-            Vector3 spawnPos = GetRandomPosition(); 
-            GameObject instance = Instantiate(Enemy, spawnPos, Quaternion.identity);
-            MonsterList.Add(instance);
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 spawnPos = GetRandomPosition();
+                GameObject instance = Instantiate(Enemy, spawnPos, Quaternion.identity);
+                MonsterList.Add(instance);
+            }
+            area.enabled = false;
+            yield return new WaitForSeconds(60f);   
+
+            for (int i = 0; i < count; i++)
+                Destroy(MonsterList[i].gameObject);
+
+            MonsterList.Clear();
+            area.enabled = true;
         }
-        area.enabled = false;
-        yield return new WaitForSeconds(30f);   // 젠시간 30초
-
-        for (int i = 0; i < count; i++) 
-            Destroy(MonsterList[i].gameObject);
-
-        MonsterList.Clear();          
-        area.enabled = true;
-        StartCoroutine("Spawn", 30);    
     }
 
     
