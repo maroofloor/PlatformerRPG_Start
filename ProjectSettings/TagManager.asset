@@ -7,6 +7,8 @@ TagManager:
   - Ground
   - Background
   - Area
+  - SpawnPoint
+  - Monster
   layers:
   - Default
   - TransparentFX
@@ -17,7 +19,7 @@ TagManager:
   - Monster
   - Ground
   - Player
-  - 
+  - Area
   - 
   - 
   - 

@@ -6,8 +6,8 @@ public class Monster : MonoBehaviour
 {
     public float movepower = 1f;
     Animator anim;
-    Vector3 movement = Vector3.zero;    
-    Rigidbody2D rigid;      
+    Vector3 movement = Vector3.zero;
+    Rigidbody2D rigid;
     bool isRight; // 움직이던 정지해있던 간에 바라보는 방향 == true면 오른쪽, false면 왼쪽 
     bool isMove; // true면 움직이고 false면 정지. 트루일때 움직일건데 일단 한쪽방향으로만 진행하는데 isRight가 트루면 *1 펄스면 *(-1)
 
@@ -42,7 +42,7 @@ public class Monster : MonoBehaviour
             yield return new WaitForSeconds(Random.Range(1f, 3f));
 
             isMove = false;
-            isRight = Random.Range(0, 2) == 0 ? true : false;           
+            isRight = Random.Range(0, 2) == 0 ? true : false;
             yield return new WaitForSeconds(Random.Range(0.5f, 1f));
             anim.SetBool("Walk", isMove);
         }
@@ -51,33 +51,33 @@ public class Monster : MonoBehaviour
 
     void Update()
     {
-       //Move();
+        //Move();
         StartCoroutine(Hit());
     }
     void FixedUpdate()
-    {        
+    {
         //낭떠러지 앞에서 방향 전환
-        Vector2 frontVec = new Vector2(rigid.position.x + (isRight? 0.5f:- 0.5f), rigid.position.y);
+        Vector2 frontVec = new Vector2(rigid.position.x + (isRight ? 0.5f : -0.5f), rigid.position.y);
         Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
         RaycastHit2D rayHit = Physics2D.Raycast(frontVec, Vector3.down, 1, LayerMask.GetMask("Ground"));
         if (rayHit.collider == null)
-        {           
+        {
             isRight = isRight ? false : true;
         }
 
         //공격범위
         e_attack.x = rigid.position.x;
         e_attack.y = rigid.position.y + 0.5f;
-        
+
         if (isRight == false) // 왼쪽일 때...
-        {           
+        {
             Debug.DrawRay(e_attack, Vector3.left, new Color(1, 0, 0));
             frontperception = Physics2D.Raycast(e_attack, Vector3.left, 1, LayerMask.GetMask("Player"));
             Debug.DrawRay(e_attack, Vector3.right, new Color(0, 0, 1));
             backperception = Physics2D.Raycast(e_attack, Vector3.right, 1, LayerMask.GetMask("Player"));
         }
-        else 
-        {           
+        else
+        {
             Debug.DrawRay(e_attack, Vector3.right, new Color(1, 0, 0));
             frontperception = Physics2D.Raycast(e_attack, Vector3.right, 1, LayerMask.GetMask("Player"));
             Debug.DrawRay(e_attack, Vector3.left, new Color(0, 0, 1));
@@ -165,7 +165,7 @@ public class Monster : MonoBehaviour
             Debug.Log("몬스터 체력 : " + enemy_stat.HP + " / " + enemy_stat.MaxHP);
 
             if (enemy_stat.HP <= 0)
-            {               
+            {
                 anim.SetTrigger("Dead");
                 yield return new WaitForSeconds(1f);
                 Debug.Log("몬스터 사망");
@@ -173,10 +173,5 @@ public class Monster : MonoBehaviour
             }
         }
     }
-    //IEnumerator Battle()
-    //{
-        
-    //    yield return new WaitForSeconds(1f);
-    //}
-    
+  
 }
