@@ -175,16 +175,11 @@ public class Player : MonoBehaviour, AllInterface.IHit
         }
     }
 
-    public void AttackHitCheck()
-    {
-        if (hit.collider != null)
-        {
-            hit.transform.GetComponent<_Monster>().Hit(myStat.Att, transform.position);
-        }
-    }
-
     IEnumerator PlayAttack()
     {
+        if (hit.collider != null)
+            hit.transform.GetComponent<_Monster>().Hit(myStat.Att, transform.position);
+
         if (attackNum == 1)
         {
             anim.SetTrigger("IsAttack1");
@@ -196,7 +191,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
         {
             anim.SetTrigger("IsAttack2");
             isAttack2 = true;
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.6f);
             isAttack2 = false;
 
             if (attackNum >= 2)
