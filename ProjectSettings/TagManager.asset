@@ -7,14 +7,15 @@ TagManager:
   - Ground
   - Background
   - Area
+  - Enemy
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
-  - 
+  - Enemy
   - 
   - 
   - 

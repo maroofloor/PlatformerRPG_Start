@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, AllInterface.IHit
 {
     Animator anim;
-    Rigidbody2D rigid;    
+    Rigidbody2D rigid;
 
     public float rollCool;
     Coroutine rollCor = null;
@@ -26,6 +26,7 @@ public class Player : MonoBehaviour
     bool isAttack2; // 공격 2번 모션중일 때 true
     bool isRoll; // 구르는 모션중일 때 true
     bool isAlive => myStat.HP > 0; // HP가 0보다 크면 살아있음
+    bool isHit;
 
     int attackNum = 0; // 공격콤보
     int jumpNum = 0; // 점프 횟수
@@ -36,6 +37,9 @@ public class Player : MonoBehaviour
     float[] enforceAtt = new float[11] { 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 600 };
     float[] enforceDef = new float[11] { 0, 2, 6, 12, 20, 30, 42, 56, 72, 90, 550 };
     float[] enforceHP = new float[11] { 100, 200, 330, 490, 680, 900, 1150, 1440, 1770, 2140, 3000 };
+
+    RaycastHit2D hit;
+    LayerMask enemyLayer;
 
     void Start()
     {
@@ -48,11 +52,13 @@ public class Player : MonoBehaviour
         isRoll = false;
         myStat = new AllStruct.Stat(enforceHP[0], enforceAtt[0], enforceDef[0]);
         enforceVal = 0;
+        isHit = false;
+        enemyLayer = 1 << LayerMask.NameToLayer("Enemy");
     }
 
     public void Jump()
     {
-        if (jumpNum < 2 && !isRoll && isAlive) // C키로 점프
+        if (jumpNum < 2 && !isRoll && isAlive && !isHit) // C키로 점프
         {
             jumpNum++;
             if (vec.x != 0)
@@ -72,7 +78,7 @@ public class Player : MonoBehaviour
     }
     public void Attack()
     {
-        if (attackNum < 2 && !isRoll && isAlive)
+        if (attackNum < 2 && !isRoll && isAlive && !isHit)
         {
             if (vec.x != 0)
             {
@@ -94,29 +100,29 @@ public class Player : MonoBehaviour
     }
     public void Roll()
     {
-        if (!isAttack1 && !isAttack2 && !isRoll && !isJump && isAlive && rollCool <= 0f)
+        if (!isAttack1 && !isAttack2 && !isRoll && !isJump && isAlive && rollCool <= 0f && !isHit)
             StartCoroutine(PlayRoll());
     }
-    //public void Move(float dir)
-    //{
-
-    //}
 
     void Update()
     {
-        //vec.x = Input.GetAxisRaw("Horizontal");
+        Debug.DrawRay(new Vector2(transform.position.x, transform.position.y + 0.5f), (isLeft ? Vector2.left : Vector2.right) * 2f, new Color(1, 0, 0));
+        hit = Physics2D.Raycast(transform.position, isLeft ? Vector2.left : Vector2.right, 2f, enemyLayer);
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            myStat.HP -= 10f;
-            Debug.Log("플레이어 체력 : " + myStat.HP + " / " + myStat.MaxHP);
-            if (!isAlive)
-                anim.SetTrigger("IsDeath"); // HP 가 0보다 높으면 true, 낮으면 false...
-        }
+        if (hit.collider != null)
+            Physics2D.IgnoreCollision(transform.GetComponent<CapsuleCollider2D>(), hit.collider, isRoll);
+
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    myStat.HP -= 10f;
+        //    Debug.Log("플레이어 체력 : " + myStat.HP + " / " + myStat.MaxHP);
+        //    if (!isAlive)
+        //        anim.SetTrigger("IsDeath"); // HP 가 0보다 높으면 true, 낮으면 false...
+        //}
     }
     void LateUpdate()
     {
-        if (vec.x != 0 && !isAttack1 && !isAttack2 && isAlive && !isJump && !isRoll)
+        if (vec.x != 0 && !isAttack1 && !isAttack2 && isAlive && !isJump && !isRoll && !isHit)
         {
             scaleVec.x = vec.x; // scaleVec이 기본으로 Vector3.one(1, 1, 1)이기 때문에 x만 -1 혹은 1로 바꾸면...
             transform.localScale = scaleVec; // 플레이어가 바라보는 방향이 바뀜.
@@ -126,31 +132,29 @@ public class Player : MonoBehaviour
                 isLeft = false;
         }
         anim.SetBool("IsMove", isMove); // vec.x가 0이 아닐 때 isMove가 true, 0이면 false...
-        
     }
 
     private void FixedUpdate()
     {
-        if (isAlive && !isAttack1 && !isAttack2 && !isRoll && !isJump)// 공격중, 회피중에 이동 할 수 없음
-        transform.Translate(vec.normalized * Time.fixedDeltaTime * speed); // 캐릭터의 이동
-
-        //if (isAlive && !isAttack1 && !isAttack2 && !isRoll && !isJump)// 공격중, 회피중에 이동 할 수 없음
-        //    transform.Translate(vec.normalized * Time.fixedDeltaTime * speed); // 캐릭터의 이동
+        if (isAlive && !isAttack1 && !isAttack2 && !isRoll && !isJump && !isHit) // 공격중, 회피중에 이동 할 수 없음
+            transform.Translate(vec.normalized * Time.fixedDeltaTime * speed); // 캐릭터의 이동
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground") && isAlive) // 땅에 착지할 때...
         {
-            rigid.velocity = Vector3.zero; // 없으면 캐릭터가 공격중 착지했을때에 이동이 가능한데 모션이 이상함...
             isJump = false;
             anim.SetBool("IsJump", isJump);
-            if (collision.contacts[0].point.y <= (transform.position.y + 0.2f))
+            if (collision.contacts[0].point.y <= (transform.position.y + 0.3f))
             {
                 jumpNum = 0;
                 jumpVec = Vector3.zero;
+                rigid.velocity = Vector3.zero; // 없으면 캐릭터가 공격중 착지했을때에 이동이 가능한데 모션이 이상함...
             }
         }
+        else if (collision.gameObject.CompareTag("Enemy"))
+            Hit(collision.transform.GetComponent<_Monster>().stat.Att, collision.transform.position);
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
@@ -162,14 +166,23 @@ public class Player : MonoBehaviour
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Ground") && isAlive) // 땅에서 접촉이 떨어졌을 때...
+        if (collision.gameObject.CompareTag("Ground") && isAlive && !isHit) // 땅에서 접촉이 떨어졌을 때...
         {
             isJump = true;
             anim.SetBool("IsJump", isJump);
             if (jumpVec.y == 0f)
-            rigid.velocity = Vector3.right * (isLeft ? -1 : 1) * speed;
+                rigid.velocity = Vector3.right * (isLeft ? -1 : 1) * speed;
         }
     }
+
+    public void AttackHitCheck()
+    {
+        if (hit.collider != null)
+        {
+            hit.transform.GetComponent<_Monster>().Hit(myStat.Att, transform.position);
+        }
+    }
+
     IEnumerator PlayAttack()
     {
         if (attackNum == 1)
@@ -204,9 +217,8 @@ public class Player : MonoBehaviour
             rigid.velocity = rollVec;
         }
         else
-        {
             jumpNum += 2;
-        }
+
         isRoll = false;
         rollCool = 3f; // 쿨타임 3초
         if (rollCor == null)
@@ -238,7 +250,7 @@ public class Player : MonoBehaviour
                         {
                             myStat.Att = enforceAtt[i];
                             enforceVal--;
-                            UIManager.Instance.PrintWarningMsg($"강화 수치를 사용하여 공격력을 강화 합니다.\n{enforceAtt[i-1]} -> {enforceAtt[i]}");
+                            UIManager.Instance.PrintWarningMsg($"강화 개수를 사용하여 공격력을 강화 합니다.\n{enforceAtt[i - 1]} -> {enforceAtt[i]}");
                             return;
                         }
                     }
@@ -250,7 +262,7 @@ public class Player : MonoBehaviour
                         {
                             myStat.Def = enforceDef[i];
                             enforceVal--;
-                            UIManager.Instance.PrintWarningMsg($"강화 수치를 사용하여 방어력을 강화 합니다.\n{enforceDef[i - 1]} -> {enforceDef[i]}");
+                            UIManager.Instance.PrintWarningMsg($"강화 개수를 사용하여 방어력을 강화 합니다.\n{enforceDef[i - 1]} -> {enforceDef[i]}");
                             return;
                         }
                     }
@@ -263,7 +275,7 @@ public class Player : MonoBehaviour
                             myStat.MaxHP = enforceHP[i];
                             myStat.HP += enforceHP[i] - enforceHP[i - 1]; // 증가한 값 만큼 HP에 더하기
                             enforceVal--;
-                            UIManager.Instance.PrintWarningMsg($"강화 수치를 사용하여 최대체력을 강화 합니다.\n{enforceHP[i - 1]} -> {enforceHP[i]}");
+                            UIManager.Instance.PrintWarningMsg($"강화 개수를 사용하여 최대체력을 강화 합니다.\n{enforceHP[i - 1]} -> {enforceHP[i]}");
                             return;
                         }
                     }
@@ -273,6 +285,35 @@ public class Player : MonoBehaviour
         else
         {
             UIManager.Instance.PrintWarningMsg("강화개수가 부족하여 강화할 수 없습니다.");
-        }        
+        }
+    }
+
+    public void Hit(float damage, Vector2 pos)
+    {
+        Mathf.Clamp(myStat.HP -= damage, 0, myStat.MaxHP);
+        #region 넉백될 벡터 구하기
+        Vector2 KnockVec = Vector2.zero;
+        KnockVec = (Vector2)transform.position - pos;
+        bool dirIsLeft = KnockVec.x < 0f;
+        KnockVec = dirIsLeft ? Vector2.left : Vector2.right;
+        KnockVec.y = 0.5f;
+        KnockVec *= 5f;
+        #endregion
+        rigid.velocity = KnockVec;
+        if (!isAlive)
+            anim.SetTrigger("IsDeath");
+        else
+        {
+            anim.SetTrigger("IsHit");
+            StartCoroutine(HitWait());
+        }
+    }
+
+    IEnumerator HitWait()
+    {
+        isHit = true;
+        yield return new WaitForSeconds(1f);
+        isHit = false;
+        rigid.velocity = Vector2.zero;
     }
 }

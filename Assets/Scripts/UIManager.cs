@@ -21,10 +21,10 @@ public class UIManager : Singleton<UIManager>
     [SerializeField]
     Transform uiEnforceTr;
     [SerializeField]
-    Transform mobileControllerTr;
-    [SerializeField]
     Transform warningMsgTr;
     Text warningInfoTxt;
+    public Transform mobileControllerTr;
+
     bool isMenuOn;
     bool isEnforceOn;
 

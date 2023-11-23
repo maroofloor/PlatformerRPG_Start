@@ -34,15 +34,10 @@ public class InputManager : MonoBehaviour
     void Update()
     {
         joyDir.x = Vector3.right.x * variableJoystick.Horizontal;
-
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
-        {
             player.vec.x = Input.GetAxisRaw("Horizontal");
-        }
         else
-        {
             player.vec.x = joyDir.x;
-        }
 
         if (!IsAndroid)
         {
