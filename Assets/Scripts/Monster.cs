@@ -10,12 +10,14 @@ public class Monster : MonoBehaviour
     Rigidbody2D rigid;
     bool isRight; // 움직이던 정지해있던 간에 바라보는 방향 == true면 오른쪽, false면 왼쪽 
     bool isMove; // true면 움직이고 false면 정지. 트루일때 움직일건데 일단 한쪽방향으로만 진행하는데 isRight가 트루면 *1 펄스면 *(-1)
-
+    
     public AllStruct.Stat enemy_stat;
     Player player;
 
     [SerializeField]
     Slider HPBar;
+    [SerializeField]
+    Text text;
 
     Vector2 e_attack = Vector2.zero;
     RaycastHit2D frontperception;
@@ -30,7 +32,7 @@ public class Monster : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         StartCoroutine(Changemovement());
-        isRight = true;
+        isRight = true;        
     }
 
     IEnumerator Changemovement()
@@ -53,6 +55,7 @@ public class Monster : MonoBehaviour
     {
         //Move();
         StartCoroutine(Hit());
+        text.text = $"{enemy_stat.HP} / {enemy_stat.MaxHP}";
     }
     void FixedUpdate()
     {
@@ -118,6 +121,7 @@ public class Monster : MonoBehaviour
                 transform.localScale = new Vector3(5, 5, 1);
                 rigid.velocity = new Vector2(1, rigid.velocity.y) * movepower;
                 HPBar.transform.localScale = new Vector3(0.02f, 0.02f, 1);
+                text.transform.localScale = new Vector3(0.01f, 0.01f, 1);
             }
             else if (isRight == false)
             {
@@ -125,6 +129,7 @@ public class Monster : MonoBehaviour
                 transform.localScale = new Vector3(-5, 5, 1);
                 rigid.velocity = new Vector2(-1, rigid.velocity.y) * movepower;
                 HPBar.transform.localScale = new Vector3(-0.02f, 0.02f, 1);
+                text.transform.localScale = new Vector3(-0.01f, 0.01f, 1);
             }
         }
     }
