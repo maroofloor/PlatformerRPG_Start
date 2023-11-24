@@ -10,9 +10,11 @@ public class Monster : MonoBehaviour
     Rigidbody2D rigid;
     bool isRight; // 움직이던 정지해있던 간에 바라보는 방향 == true면 오른쪽, false면 왼쪽 
     bool isMove; // true면 움직이고 false면 정지. 트루일때 움직일건데 일단 한쪽방향으로만 진행하는데 isRight가 트루면 *1 펄스면 *(-1)
-    
+    Vector3 direction = Vector3.zero;
+    float Knockbackpower = 3f;
     public AllStruct.Stat enemy_stat;
     Player player;
+
 
     [SerializeField]
     Slider HPBar;
@@ -32,7 +34,7 @@ public class Monster : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         StartCoroutine(Changemovement());
-        isRight = true;        
+        isRight = true;
     }
 
     IEnumerator Changemovement()
@@ -47,6 +49,7 @@ public class Monster : MonoBehaviour
             isRight = Random.Range(0, 2) == 0 ? true : false;
             yield return new WaitForSeconds(Random.Range(0.5f, 1f));
             anim.SetBool("Walk", isMove);
+
         }
     }
 
@@ -54,11 +57,32 @@ public class Monster : MonoBehaviour
     void Update()
     {
         //Move();
-        StartCoroutine(Hit());
+        //StartCoroutine(Hit());
         text.text = $"{enemy_stat.HP} / {enemy_stat.MaxHP}";
     }
     void FixedUpdate()
     {
+        if (isMove)
+        {
+
+            if (isRight == true)
+            {
+                movement = Vector3.right;
+                transform.localScale = new Vector3(5, 5, 1);
+                rigid.velocity = new Vector2(1, rigid.velocity.y) * movepower;
+                HPBar.transform.localScale = new Vector3(0.02f, 0.02f, 1);
+                text.transform.localScale = new Vector3(0.01f, 0.01f, 1);
+            }
+            else if (isRight == false)
+            {
+                movement = Vector3.left;
+                transform.localScale = new Vector3(-5, 5, 1);
+                rigid.velocity = new Vector2(-1, rigid.velocity.y) * movepower;
+                HPBar.transform.localScale = new Vector3(-0.02f, 0.02f, 1);
+                text.transform.localScale = new Vector3(-0.01f, 0.01f, 1);
+            }
+        }
+
         //낭떠러지 앞에서 방향 전환
         Vector2 frontVec = new Vector2(rigid.position.x + (isRight ? 0.5f : -0.5f), rigid.position.y);
         Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
@@ -104,35 +128,12 @@ public class Monster : MonoBehaviour
             anim.SetBool("Attack", false);
         }
 
-        if (enemy_stat.HP <= 0)
-        {
-            isMove = false;
-            StartCoroutine(Hit());
-        }
     }
-    void LateUpdate()
-    {
-        if (isMove)
-        {
 
-            if (isRight == true)
-            {
-                movement = Vector3.right;
-                transform.localScale = new Vector3(5, 5, 1);
-                rigid.velocity = new Vector2(1, rigid.velocity.y) * movepower;
-                HPBar.transform.localScale = new Vector3(0.02f, 0.02f, 1);
-                text.transform.localScale = new Vector3(0.01f, 0.01f, 1);
-            }
-            else if (isRight == false)
-            {
-                movement = Vector3.left;
-                transform.localScale = new Vector3(-5, 5, 1);
-                rigid.velocity = new Vector2(-1, rigid.velocity.y) * movepower;
-                HPBar.transform.localScale = new Vector3(-0.02f, 0.02f, 1);
-                text.transform.localScale = new Vector3(-0.01f, 0.01f, 1);
-            }
-        }
-    }
+    //void LateUpdate()
+    //{
+
+    //}
 
     //void Move()
     //{
@@ -160,23 +161,61 @@ public class Monster : MonoBehaviour
     //    }
     //}
 
-    IEnumerator Hit()
+    //IEnumerator Hit()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.A)) // 임시로 A키 누를시 몬스터 체력 깎임 추후 플레이어 공격으로 바꿀 예정
+    //    {
+    //        enemy_stat.HP -= 100; // 플레이어의 공격력만큼 데미지 입음
+
+    //        anim.SetTrigger("Hit");
+    //        HPBar.value = enemy_stat.HP;
+    //        Debug.Log("몬스터 체력 : " + enemy_stat.HP + " / " + enemy_stat.MaxHP);
+
+    //        if (enemy_stat.HP <= 0)
+    //        {                
+    //            isMove = false;
+    //            anim.SetTrigger("Dead");
+    //            yield return new WaitForSeconds(1.5f);
+    //            Debug.Log("몬스터 사망");
+    //            Destroy(gameObject); // HP = 0일시 없어짐
+    //        }
+    //    }
+    //}
+     
+    private void OnCollisionEnter2D(Collision2D collision) 
     {
-        if (Input.GetKeyDown(KeyCode.A)) // 임시로 A키 누를시 몬스터 체력 깎임 추후 플레이어 공격으로 바꿀 예정
+        if (collision.gameObject.CompareTag("Player"))
         {
             enemy_stat.HP -= 100; // 플레이어의 공격력만큼 데미지 입음
             anim.SetTrigger("Hit");
             HPBar.value = enemy_stat.HP;
+            //direction = (transform.position - collision.transform.position).normalized;
+            //direction.x += 1;
+            //direction.y += 2;
+            //direction *= Knockbackpower;
+            //collision.transform.GetComponent<GameObject>();
+            //Hit(direction);
             Debug.Log("몬스터 체력 : " + enemy_stat.HP + " / " + enemy_stat.MaxHP);
 
             if (enemy_stat.HP <= 0)
             {
                 anim.SetTrigger("Dead");
-                yield return new WaitForSeconds(1f);
-                Debug.Log("몬스터 사망");
-                Destroy(gameObject); // HP = 0일시 없어짐
+                Invoke("Die", 1.5f);
             }
         }
     }
-  
+    //void Hit(Vector3 dir)
+    //{
+    //   // rigid.AddForce(dir, ForceMode2D.Force);
+    //    enemy_stat.HP -= 100; // 플레이어의 공격력만큼 데미지 입음
+    //    anim.SetTrigger("Hit");
+    //    HPBar.value = enemy_stat.HP;
+    //}
+    void Die()
+    {
+        isMove = false;       
+        Debug.Log("몬스터 사망");
+        Destroy(gameObject); // HP = 0일시 없어짐
+    }
+
 }
