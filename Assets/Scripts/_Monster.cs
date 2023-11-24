@@ -13,7 +13,7 @@ public class _Monster : MonoBehaviour, AllInterface.IHit
 
     private void FixedUpdate()
     {
-        Debug.Log("몬스터 체력 : " + stat.HP + " / " + stat.MaxHP);
+        //Debug.Log("몬스터 체력 : " + stat.HP + " / " + stat.MaxHP);
     }
 
     public void Hit(float damage, Vector2 pos)

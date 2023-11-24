@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class UIManager : Singleton<UIManager>
 {
     [SerializeField]
-    Transform savebuttonTr;
+    Transform[] buttonsTr;
     [SerializeField]
     Player player;
     [SerializeField]
@@ -120,15 +120,15 @@ public class UIManager : Singleton<UIManager>
         }
     }
 
-    public void PointerDown()
+    public void PointerDown(int num)
     {
-        savebuttonTr.GetChild(0).gameObject.SetActive(false);
-        savebuttonTr.GetChild(1).gameObject.SetActive(true);
+        buttonsTr[num].GetChild(0).gameObject.SetActive(false);
+        buttonsTr[num].GetChild(1).gameObject.SetActive(true);
     }
 
-    public void PointerUP()
+    public void PointerUP(int num)
     {
-        savebuttonTr.GetChild(0).gameObject.SetActive(true);
-        savebuttonTr.GetChild(1).gameObject.SetActive(false);
+        buttonsTr[num].GetChild(0).gameObject.SetActive(true);
+        buttonsTr[num].GetChild(1).gameObject.SetActive(false);
     }
 }

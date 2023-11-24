@@ -6,8 +6,8 @@ TagManager:
   tags:
   - Ground
   - Background
-  - Area
   - Enemy
+  - Portal
   layers:
   - Default
   - TransparentFX
