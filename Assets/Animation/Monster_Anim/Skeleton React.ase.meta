@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0c3973149b45cda4694793823ea40e3d
+guid: f36ab3606bce457488101435f2b6c784
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -33,7 +33,7 @@ ScriptedImporter:
     spriteMeshType: 1
     alignment: 0
     spritePivot: {x: 0.5, y: 0.5}
-    spritePixelsToUnits: 16
+    spritePixelsToUnits: 100
     spriteBorder: {x: 0, y: 0, z: 0, w: 0}
     spriteGenerateFallbackPhysicsShape: 0
     generateCubemap: 6
@@ -93,7 +93,7 @@ ScriptedImporter:
     addSortingGroup: 1
     addShadowCasters: 0
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638363338152084947
+  platformSettingsDirtyTick: 0
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -128,7 +128,7 @@ ScriptedImporter:
       y: 4
       width: 22
       height: 32
-    spriteID: 86b2541a13f0f1041a1df6fff79409ae
+    spriteID: 7cff34ba90ce08041bb286a21a9b201c
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -148,7 +148,7 @@ ScriptedImporter:
       y: 44
       width: 22
       height: 32
-    spriteID: 234153b68efe9624ea91e173445806c5
+    spriteID: e8cb3b7c14548284995918a00b7843ae
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -168,7 +168,7 @@ ScriptedImporter:
       y: 84
       width: 22
       height: 32
-    spriteID: 760df289de6e0bb4ab1b84ec85c9bf7a
+    spriteID: a80bf1652b9cae04a9a2dcbccf90a5ec
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -188,7 +188,7 @@ ScriptedImporter:
       y: 4
       width: 22
       height: 32
-    spriteID: 5b46dda9c3c42634f814c1bbf0a4e91a
+    spriteID: 2907ac1e5a479b542b715a4c7cde2bfe
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -213,7 +213,7 @@ ScriptedImporter:
         y: 0
         width: 22
         height: 32
-      spriteId: 86b2541a13f0f1041a1df6fff79409ae
+      spriteId: 7cff34ba90ce08041bb286a21a9b201c
     - name: Skeleton React_Frame_1
       frameIndex: 1
       cellRect:
@@ -221,7 +221,7 @@ ScriptedImporter:
         y: 0
         width: 22
         height: 32
-      spriteId: 234153b68efe9624ea91e173445806c5
+      spriteId: e8cb3b7c14548284995918a00b7843ae
     - name: Skeleton React_Frame_2
       frameIndex: 2
       cellRect:
@@ -229,7 +229,7 @@ ScriptedImporter:
         y: 0
         width: 22
         height: 32
-      spriteId: 760df289de6e0bb4ab1b84ec85c9bf7a
+      spriteId: a80bf1652b9cae04a9a2dcbccf90a5ec
     - name: Skeleton React_Frame_3
       frameIndex: 3
       cellRect:
@@ -237,65 +237,10 @@ ScriptedImporter:
         y: 0
         width: 22
         height: 32
-      spriteId: 5b46dda9c3c42634f814c1bbf0a4e91a
+      spriteId: 2907ac1e5a479b542b715a4c7cde2bfe
     linkedCells: []
     parentIndex: -1
-  platformSettings:
-  - name: DefaultTexturePlatform
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
-  - name: Standalone
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
-  - name: Server
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
-  - name: Android
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
-  - name: iPhone
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
+  platformSettings: []
   secondarySpriteTextures: []
   spritePackingTag: 
   canvasSize: {x: 22, y: 32}

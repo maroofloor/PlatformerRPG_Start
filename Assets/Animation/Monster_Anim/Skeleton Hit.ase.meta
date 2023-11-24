@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0c3973149b45cda4694793823ea40e3d
+guid: 6bfbd05a1e20468498aee29bf4a2c04c
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -33,7 +33,7 @@ ScriptedImporter:
     spriteMeshType: 1
     alignment: 0
     spritePivot: {x: 0.5, y: 0.5}
-    spritePixelsToUnits: 16
+    spritePixelsToUnits: 100
     spriteBorder: {x: 0, y: 0, z: 0, w: 0}
     spriteGenerateFallbackPhysicsShape: 0
     generateCubemap: 6
@@ -93,7 +93,7 @@ ScriptedImporter:
     addSortingGroup: 1
     addShadowCasters: 0
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638363338152084947
+  platformSettingsDirtyTick: 0
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -117,18 +117,38 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: Skeleton React_Frame_0
+  - name: Skeleton Hit_Frame_0
     originalName: 
-    pivot: {x: 0.5, y: 0}
+    pivot: {x: 0.40909094, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
-      x: 4
+      x: 36
+      y: 84
+      width: 22
+      height: 32
+    spriteID: 549cc68583da22d4fb3980f9f2cb06a8
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 36, y: 84}
+  - name: Skeleton Hit_Frame_1
+    originalName: 
+    pivot: {x: 0.40909094, y: 0}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 67
       y: 4
       width: 22
       height: 32
-    spriteID: 86b2541a13f0f1041a1df6fff79409ae
+    spriteID: eb5cfab7de629fe4e94f77dc7d2f1c38
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -136,39 +156,19 @@ ScriptedImporter:
     indices: 
     edges: []
     tessellationDetail: 0
-    uvTransform: {x: 4, y: 4}
-  - name: Skeleton React_Frame_1
+    uvTransform: {x: 67, y: 4}
+  - name: Skeleton Hit_Frame_2
     originalName: 
-    pivot: {x: 0.5, y: 0}
-    alignment: 9
-    border: {x: 0, y: 0, z: 0, w: 0}
-    rect:
-      serializedVersion: 2
-      x: 4
-      y: 44
-      width: 22
-      height: 32
-    spriteID: 234153b68efe9624ea91e173445806c5
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    uvTransform: {x: 4, y: 44}
-  - name: Skeleton React_Frame_2
-    originalName: 
-    pivot: {x: 0.5, y: 0}
+    pivot: {x: 0.56521744, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 84
-      width: 22
+      width: 23
       height: 32
-    spriteID: 760df289de6e0bb4ab1b84ec85c9bf7a
+    spriteID: d45a2be9b78592346bc9440aedd01bf5
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -177,18 +177,18 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 4, y: 84}
-  - name: Skeleton React_Frame_3
+  - name: Skeleton Hit_Frame_3
     originalName: 
-    pivot: {x: 0.5, y: 0}
+    pivot: {x: 0.625, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
-      x: 34
+      x: 4
       y: 4
-      width: 22
+      width: 24
       height: 32
-    spriteID: 5b46dda9c3c42634f814c1bbf0a4e91a
+    spriteID: d66c9b9d5642bd54ebd41fb0170fe2d6
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -196,106 +196,163 @@ ScriptedImporter:
     indices: 
     edges: []
     tessellationDetail: 0
-    uvTransform: {x: 34, y: 4}
+    uvTransform: {x: 4, y: 4}
+  - name: Skeleton Hit_Frame_4
+    originalName: 
+    pivot: {x: 0.5217392, y: 0}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 36
+      y: 4
+      width: 23
+      height: 32
+    spriteID: 35860626b1ed0e747a9a754520ffb611
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 36, y: 4}
+  - name: Skeleton Hit_Frame_5
+    originalName: 
+    pivot: {x: 0.375, y: 0}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 4
+      y: 44
+      width: 24
+      height: 32
+    spriteID: bf7f7774898657846a52f76523c9b83f
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 4, y: 44}
+  - name: Skeleton Hit_Frame_6
+    originalName: 
+    pivot: {x: 0.39130437, y: 0}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 36
+      y: 44
+      width: 23
+      height: 32
+    spriteID: da3f08023997f86458ab75cbd8585fa5
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 36, y: 44}
+  - name: Skeleton Hit_Frame_7
+    originalName: 
+    pivot: {x: 0.40909094, y: 0}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 67
+      y: 44
+      width: 22
+      height: 32
+    spriteID: ffc08e3ed08b4824599ff95381503cbc
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 67, y: 44}
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: 1533878226
-    name: Skeleton React
+    guid: 406672308
+    name: Skeleton Hit
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: Skeleton React_Frame_0
+    - name: Skeleton Hit_Frame_0
       frameIndex: 0
       cellRect:
-        x: 0
+        x: 6
         y: 0
         width: 22
         height: 32
-      spriteId: 86b2541a13f0f1041a1df6fff79409ae
-    - name: Skeleton React_Frame_1
+      spriteId: 549cc68583da22d4fb3980f9f2cb06a8
+    - name: Skeleton Hit_Frame_1
       frameIndex: 1
       cellRect:
-        x: 0
+        x: 6
         y: 0
         width: 22
         height: 32
-      spriteId: 234153b68efe9624ea91e173445806c5
-    - name: Skeleton React_Frame_2
+      spriteId: eb5cfab7de629fe4e94f77dc7d2f1c38
+    - name: Skeleton Hit_Frame_2
       frameIndex: 2
       cellRect:
-        x: 0
+        x: 2
         y: 0
-        width: 22
+        width: 23
         height: 32
-      spriteId: 760df289de6e0bb4ab1b84ec85c9bf7a
-    - name: Skeleton React_Frame_3
+      spriteId: d45a2be9b78592346bc9440aedd01bf5
+    - name: Skeleton Hit_Frame_3
       frameIndex: 3
       cellRect:
         x: 0
         y: 0
+        width: 24
+        height: 32
+      spriteId: d66c9b9d5642bd54ebd41fb0170fe2d6
+    - name: Skeleton Hit_Frame_4
+      frameIndex: 4
+      cellRect:
+        x: 3
+        y: 0
+        width: 23
+        height: 32
+      spriteId: 35860626b1ed0e747a9a754520ffb611
+    - name: Skeleton Hit_Frame_5
+      frameIndex: 5
+      cellRect:
+        x: 6
+        y: 0
+        width: 24
+        height: 32
+      spriteId: bf7f7774898657846a52f76523c9b83f
+    - name: Skeleton Hit_Frame_6
+      frameIndex: 6
+      cellRect:
+        x: 6
+        y: 0
+        width: 23
+        height: 32
+      spriteId: da3f08023997f86458ab75cbd8585fa5
+    - name: Skeleton Hit_Frame_7
+      frameIndex: 7
+      cellRect:
+        x: 6
+        y: 0
         width: 22
         height: 32
-      spriteId: 5b46dda9c3c42634f814c1bbf0a4e91a
+      spriteId: ffc08e3ed08b4824599ff95381503cbc
     linkedCells: []
     parentIndex: -1
-  platformSettings:
-  - name: DefaultTexturePlatform
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
-  - name: Standalone
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
-  - name: Server
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
-  - name: Android
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
-  - name: iPhone
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
+  platformSettings: []
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 22, y: 32}
+  canvasSize: {x: 30, y: 32}

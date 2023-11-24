@@ -102,6 +102,18 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
     buildTarget: iPhone
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -144,7 +156,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 20615cc9c03c07d47a8141989c109e25
-      internalID: -1221340372
+      internalID: -1515603127067585740
       vertices: []
       indices: 
       edges: []
@@ -165,7 +177,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: f61a9603f57ba6e41a19f17990115e3e
-      internalID: 591240064
+      internalID: -974260186754260340
       vertices: []
       indices: 
       edges: []
@@ -186,7 +198,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 6065724bd85154c47996bd19de7d9240
-      internalID: -2137094435
+      internalID: 6619721271862762800
       vertices: []
       indices: 
       edges: []
@@ -207,7 +219,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: cb0b2870552e0924d9de65649a7885ac
-      internalID: -722206063
+      internalID: 436870274612170266
       vertices: []
       indices: 
       edges: []
@@ -223,10 +235,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Skeleton React_0: -1221340372
-      Skeleton React_1: 591240064
-      Skeleton React_2: -2137094435
-      Skeleton React_3: -722206063
+      Skeleton React_0: -1515603127067585740
+      Skeleton React_1: -974260186754260340
+      Skeleton React_2: 6619721271862762800
+      Skeleton React_3: 436870274612170266
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
