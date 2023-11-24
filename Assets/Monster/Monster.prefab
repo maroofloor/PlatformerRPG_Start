@@ -182,7 +182,7 @@ GameObject:
   - component: {fileID: 1744173137483094229}
   m_Layer: 6
   m_Name: Monster
-  m_TagString: Monster
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -252,7 +252,7 @@ SpriteRenderer:
   m_Size: {x: 0.17, y: 0.32}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!95 &1744173137483094226

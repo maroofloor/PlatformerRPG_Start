@@ -38,8 +38,11 @@ public class Player : MonoBehaviour, AllInterface.IHit
     float[] enforceDef = new float[11] { 0, 2, 6, 12, 20, 30, 42, 56, 72, 90, 550 };
     float[] enforceHP = new float[11] { 100, 200, 330, 490, 680, 900, 1150, 1440, 1770, 2140, 3000 };
 
-    RaycastHit2D hit;
-    LayerMask enemyLayer;
+    Vector2 rayVec;
+    RaycastHit2D[] hits;
+    public LayerMask enemyLayer;
+    LayerMask playerLayer;
+
 
     void Start()
     {
@@ -53,7 +56,9 @@ public class Player : MonoBehaviour, AllInterface.IHit
         myStat = new AllStruct.Stat(enforceHP[0], enforceAtt[0], enforceDef[0]);
         enforceVal = 0;
         isHit = false;
-        enemyLayer = 1 << LayerMask.NameToLayer("Enemy");
+        // enemyLayer = 1 << LayerMask.NameToLayer("Enemy");       
+        playerLayer = 1 << LayerMask.NameToLayer("Player");
+        rayVec = Vector2.zero;
     }
 
     public void Jump()
@@ -106,11 +111,10 @@ public class Player : MonoBehaviour, AllInterface.IHit
 
     void Update()
     {
+        rayVec = transform.position;
+        rayVec.y += 0.5f;
         Debug.DrawRay(new Vector2(transform.position.x, transform.position.y + 0.5f), (isLeft ? Vector2.left : Vector2.right) * 2f, new Color(1, 0, 0));
-        hit = Physics2D.Raycast(transform.position, isLeft ? Vector2.left : Vector2.right, 2f, enemyLayer);
-
-        if (hit.collider != null)
-            Physics2D.IgnoreCollision(transform.GetComponent<CapsuleCollider2D>(), hit.collider, isRoll);
+        hits = Physics2D.RaycastAll(rayVec, isLeft ? Vector2.left : Vector2.right, 2f, enemyLayer);
 
         //if (Input.GetKeyDown(KeyCode.Space))
         //{
@@ -154,7 +158,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
             }
         }
         else if (collision.gameObject.CompareTag("Enemy"))
-            Hit(collision.transform.GetComponent<_Monster>().stat.Att, collision.transform.position);
+            Hit(collision.transform.GetComponent<Monster>().enemy_stat.Att, collision.transform.position);
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
@@ -177,8 +181,11 @@ public class Player : MonoBehaviour, AllInterface.IHit
 
     IEnumerator PlayAttack()
     {
-        if (hit.collider != null)
-            hit.transform.GetComponent<_Monster>().Hit(myStat.Att, transform.position);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider != null && hits[i].transform.GetComponent<Monster>().isAlive)
+                hits[i].transform.GetComponent<Monster>().Hit(myStat.Att, transform.position);
+        }
 
         if (attackNum == 1)
         {
@@ -203,6 +210,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
     {
         anim.SetTrigger("IsRoll");
         isRoll = true;
+        Physics2D.IgnoreLayerCollision(3, 6);
         rollVec.x = isLeft ? -1f : 1f;
         rigid.velocity = rollVec * 8;
         yield return new WaitForSeconds(1f);
@@ -213,8 +221,8 @@ public class Player : MonoBehaviour, AllInterface.IHit
         }
         else
             jumpNum += 2;
-
         isRoll = false;
+        Physics2D.IgnoreLayerCollision(3, 6, false);
         rollCool = 3f; // ƒ≈∏¿” 3√ 
         if (rollCor == null)
             rollCor = StartCoroutine(CoolRoll());
@@ -285,22 +293,26 @@ public class Player : MonoBehaviour, AllInterface.IHit
 
     public void Hit(float damage, Vector2 pos)
     {
-        Mathf.Clamp(myStat.HP -= damage, 0, myStat.MaxHP);
-        #region ≥ÀπÈµ… ∫§≈Õ ±∏«œ±‚
-        Vector2 KnockVec = Vector2.zero;
-        KnockVec = (Vector2)transform.position - pos;
-        bool dirIsLeft = KnockVec.x < 0f;
-        KnockVec = dirIsLeft ? Vector2.left : Vector2.right;
-        KnockVec.y = 0.5f;
-        KnockVec *= 5f;
-        #endregion
-        rigid.velocity = KnockVec;
-        if (!isAlive)
-            anim.SetTrigger("IsDeath");
-        else
+        if (isAlive)
         {
-            anim.SetTrigger("IsHit");
-            StartCoroutine(HitWait());
+            myStat.HP = Mathf.Clamp(myStat.HP - damage, 0, myStat.MaxHP);
+            #region ≥ÀπÈµ… ∫§≈Õ ±∏«œ±‚
+            Vector2 KnockVec = Vector2.zero;
+            KnockVec = (Vector2)transform.position - pos;
+            bool dirIsLeft = KnockVec.x < 0f;
+            KnockVec = dirIsLeft ? Vector2.left : Vector2.right;
+            KnockVec.y = 0.5f;
+            KnockVec *= 5f;
+            #endregion
+            rigid.velocity = KnockVec;
+
+            if (!isAlive)
+                anim.SetTrigger("IsDeath");
+            else
+            {
+                anim.SetTrigger("IsHit");
+                StartCoroutine(HitWait());
+            }
         }
     }
 

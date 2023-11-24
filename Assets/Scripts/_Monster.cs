@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class _Monster : MonoBehaviour, AllInterface.IHit
+public class _Monster : MonoBehaviour
 {
     public AllStruct.Stat stat;
 
@@ -13,11 +13,8 @@ public class _Monster : MonoBehaviour, AllInterface.IHit
 
     private void FixedUpdate()
     {
-        //Debug.Log("몬스터 체력 : " + stat.HP + " / " + stat.MaxHP);
+        Debug.Log("몬스터 체력 : " + stat.HP + " / " + stat.MaxHP);
     }
 
-    public void Hit(float damage, Vector2 pos)
-    {
-        Mathf.Clamp(stat.HP -= damage, 0, stat.MaxHP);
-    }
+    
 }
