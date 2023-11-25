@@ -24,8 +24,8 @@ public class Player : MonoBehaviour, AllInterface.IHit
     bool isJump; // 체공중일 때 true
     bool isAttack1; // 공격 1번 모션중일 때 true
     bool isAttack2; // 공격 2번 모션중일 때 true
-    bool isRoll; // 구르는 모션중일 때 true
-    bool isAlive => myStat.HP > 0; // HP가 0보다 크면 살아있음
+    public bool isRoll; // 구르는 모션중일 때 true
+    public bool isAlive => myStat.HP > 0; // HP가 0보다 크면 살아있음
     bool isHit;
 
     int attackNum = 0; // 공격콤보
@@ -33,16 +33,13 @@ public class Player : MonoBehaviour, AllInterface.IHit
     float speed = 6; // 플레이어 속도
 
     [SerializeField]
-    int enforceVal;
-    float[] enforceAtt = new float[11] { 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 600 };
-    float[] enforceDef = new float[11] { 0, 2, 6, 12, 20, 30, 42, 56, 72, 90, 550 };
-    float[] enforceHP = new float[11] { 100, 200, 330, 490, 680, 900, 1150, 1440, 1770, 2140, 3000 };
+    public int killCount;
 
+    //LayerMask playerLayer;
+    //Vector2 pointVec;
     Vector2 rayVec;
     RaycastHit2D[] hits;
-    public LayerMask enemyLayer;
-    LayerMask playerLayer;
-
+    LayerMask enemyLayer;
 
     void Start()
     {
@@ -53,12 +50,16 @@ public class Player : MonoBehaviour, AllInterface.IHit
         isAttack1 = false;
         isAttack2 = false;
         isRoll = false;
-        myStat = new AllStruct.Stat(enforceHP[0], enforceAtt[0], enforceDef[0]);
-        enforceVal = 0;
+        myStat = new AllStruct.Stat(
+            GameManager.Instance.GetEneforceInfo(AllEnum.EnforceType.MaxHP, 0),
+            GameManager.Instance.GetEneforceInfo(AllEnum.EnforceType.Attack, 0),
+            GameManager.Instance.GetEneforceInfo(AllEnum.EnforceType.Defense, 0)
+            );
         isHit = false;
-        // enemyLayer = 1 << LayerMask.NameToLayer("Enemy");       
-        playerLayer = 1 << LayerMask.NameToLayer("Player");
+        enemyLayer = 1 << LayerMask.NameToLayer("Enemy");
+        //playerLayer = 1 << LayerMask.NameToLayer("Player");
         rayVec = Vector2.zero;
+        killCount = 0;
     }
 
     public void Jump()
@@ -111,10 +112,12 @@ public class Player : MonoBehaviour, AllInterface.IHit
 
     void Update()
     {
-        rayVec = transform.position;
-        rayVec.y += 0.5f;
         Debug.DrawRay(new Vector2(transform.position.x, transform.position.y + 0.5f), (isLeft ? Vector2.left : Vector2.right) * 2f, new Color(1, 0, 0));
-        hits = Physics2D.RaycastAll(rayVec, isLeft ? Vector2.left : Vector2.right, 2f, enemyLayer);
+        
+        //pointVec.x = transform.position.x + 2f * (isLeft ? -1f : 1f);
+        //pointVec.y = transform.position.y + 1.5f;
+        //Debug.DrawLine(transform.position, pointVec);
+        //hits = Physics2D.OverlapAreaAll(transform.position, pointVec, enemyLayer);
 
         //if (Input.GetKeyDown(KeyCode.Space))
         //{
@@ -181,9 +184,14 @@ public class Player : MonoBehaviour, AllInterface.IHit
 
     IEnumerator PlayAttack()
     {
+        //for (int i = 0; i < hits.Length; i++)
+        //        hits[i].transform.GetComponent<Monster>().Hit(myStat.Att, transform.position);
+        rayVec = transform.position;
+        rayVec.y += 0.5f;
+        hits = Physics2D.RaycastAll(rayVec, isLeft ? Vector2.left : Vector2.right, 2f, enemyLayer);
         for (int i = 0; i < hits.Length; i++)
         {
-            if (hits[i].collider != null && hits[i].transform.GetComponent<Monster>().isAlive)
+            if (hits[i].collider != null /*&& hits[i].transform.GetComponent<Monster>().isAlive*/)
                 hits[i].transform.GetComponent<Monster>().Hit(myStat.Att, transform.position);
         }
 
@@ -239,63 +247,14 @@ public class Player : MonoBehaviour, AllInterface.IHit
         rollCor = null;
     }
 
-    public void EnforceStat(int enforceNum)
-    {
-        AllEnum.EnforceType enforceType = (AllEnum.EnforceType)enforceNum;
-        if (enforceVal > 0)
-        {
-            switch (enforceType)
-            {
-                case AllEnum.EnforceType.Attack:
-                    for (int i = 0; i < enforceAtt.Length; i++)
-                    {
-                        if (myStat.Att < enforceAtt[i] && i != 0)
-                        {
-                            myStat.Att = enforceAtt[i];
-                            enforceVal--;
-                            UIManager.Instance.PrintWarningMsg($"강화 개수를 사용하여 공격력을 강화 합니다.\n{enforceAtt[i - 1]} -> {enforceAtt[i]}");
-                            return;
-                        }
-                    }
-                    break;
-                case AllEnum.EnforceType.Defense:
-                    for (int i = 0; i < enforceDef.Length; i++)
-                    {
-                        if (myStat.Def < enforceDef[i] && i != 0)
-                        {
-                            myStat.Def = enforceDef[i];
-                            enforceVal--;
-                            UIManager.Instance.PrintWarningMsg($"강화 개수를 사용하여 방어력을 강화 합니다.\n{enforceDef[i - 1]} -> {enforceDef[i]}");
-                            return;
-                        }
-                    }
-                    break;
-                case AllEnum.EnforceType.MaxHP:
-                    for (int i = 0; i < enforceHP.Length; i++)
-                    {
-                        if (myStat.MaxHP < enforceHP[i] && i != 0)
-                        {
-                            myStat.MaxHP = enforceHP[i];
-                            myStat.HP += enforceHP[i] - enforceHP[i - 1]; // 증가한 값 만큼 HP에 더하기
-                            enforceVal--;
-                            UIManager.Instance.PrintWarningMsg($"강화 개수를 사용하여 최대체력을 강화 합니다.\n{enforceHP[i - 1]} -> {enforceHP[i]}");
-                            return;
-                        }
-                    }
-                    break;
-            }
-        }
-        else
-        {
-            UIManager.Instance.PrintWarningMsg("강화개수가 부족하여 강화할 수 없습니다.");
-        }
-    }
-
     public void Hit(float damage, Vector2 pos)
     {
         if (isAlive)
         {
-            myStat.HP = Mathf.Clamp(myStat.HP - damage, 0, myStat.MaxHP);
+            float damageVal = damage - myStat.Def;
+            if (damageVal > 0f)
+                myStat.HP = Mathf.Clamp(myStat.HP - damageVal, 0, myStat.MaxHP);
+
             #region 넉백될 벡터 구하기
             Vector2 KnockVec = Vector2.zero;
             KnockVec = (Vector2)transform.position - pos;
@@ -307,7 +266,10 @@ public class Player : MonoBehaviour, AllInterface.IHit
             rigid.velocity = KnockVec;
 
             if (!isAlive)
+            {
                 anim.SetTrigger("IsDeath");
+                Physics2D.IgnoreLayerCollision(3, 6);
+            }
             else
             {
                 anim.SetTrigger("IsHit");
@@ -319,8 +281,26 @@ public class Player : MonoBehaviour, AllInterface.IHit
     IEnumerator HitWait()
     {
         isHit = true;
+        Physics2D.IgnoreLayerCollision(3, 6);
         yield return new WaitForSeconds(1f);
         isHit = false;
+        Physics2D.IgnoreLayerCollision(3, 6, false);
         rigid.velocity = Vector2.zero;
+    }
+
+    public void UsePotion()
+    {
+        if (potionNum > 0 && isAlive && myStat.HP < myStat.MaxHP)
+        {
+            potionNum--;
+            myStat.HP = Mathf.Clamp(myStat.HP + (int)(myStat.MaxHP * 0.3f), 0, myStat.MaxHP);
+        }
+        else
+        {
+            if (potionNum <= 0)
+                UIManager.Instance.PrintWarningMsg("소지한 포션이 없습니다.");
+            else if ((myStat.HP < myStat.MaxHP) == false)
+                UIManager.Instance.PrintWarningMsg("이미 최대체력입니다.");
+        }
     }
 }

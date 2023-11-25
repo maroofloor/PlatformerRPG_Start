@@ -11,6 +11,11 @@ public class Monster : MonoBehaviour, AllInterface.IHit
     bool isRight; // 움직이던 정지해있던 간에 바라보는 방향 == true면 오른쪽, false면 왼쪽 
     bool isMove; // true면 움직이고 false면 정지. 트루일때 움직일건데 일단 한쪽방향으로만 진행하는데 isRight가 트루면 *1 펄스면 *(-1)
     public bool isAlive => enemy_stat.HP > 0;
+    bool isAttack;
+    bool isHit;
+    float attackCool;
+    Coroutine attCoolCor = null;
+
     public AllStruct.Stat enemy_stat;
     public CapsuleCollider2D col;
 
@@ -26,7 +31,7 @@ public class Monster : MonoBehaviour, AllInterface.IHit
 
     void Start()
     {
-        enemy_stat = new AllStruct.Stat(50, 5); // 몬스터 스탯 임시로 적용
+        enemy_stat = new AllStruct.Stat(50, 10); // 몬스터 스탯 임시로 적용
         HPBar.maxValue = enemy_stat.MaxHP;
         HPBar.value = enemy_stat.HP;
         rigid = GetComponent<Rigidbody2D>();
@@ -34,55 +39,114 @@ public class Monster : MonoBehaviour, AllInterface.IHit
         StartCoroutine(Changemovement());
         isRight = true;
         col = GetComponent<CapsuleCollider2D>();
+        isAttack = false;
+        isHit = false;
+        attackCool = 0f;
     }
+
+
 
     IEnumerator Changemovement()
     {
         while (isAlive)
         {
             isMove = true;
-            anim.SetBool("Walk", isMove);
+            anim.SetBool("Walk", true);
             yield return new WaitForSeconds(Random.Range(1f, 3f));
 
             isMove = false;
+            anim.SetBool("Walk", false);
             isRight = Random.Range(0, 2) == 0 ? true : false;
-            yield return new WaitForSeconds(Random.Range(0.5f, 1f));
-            anim.SetBool("Walk", isMove);
+            yield return new WaitForSeconds(Random.Range(1f, 1.5f));
         }
     }
 
-
     void Update()
     {
-        //Move();
-        //StartCoroutine(Hit());
-        text.text = $"{enemy_stat.HP} / {enemy_stat.MaxHP}";
-        HPBar.value = enemy_stat.HP;
+        if (isAlive)
+        {
+            text.text = $"{enemy_stat.HP} / {enemy_stat.MaxHP}";
+            HPBar.value = enemy_stat.HP;
+
+            //공격범위
+            e_attack.x = rigid.position.x;
+            e_attack.y = rigid.position.y + 0.5f;
+
+            Debug.DrawRay(e_attack, isRight ? Vector3.right : Vector3.left, new Color(1, 0, 0));
+            frontperception = Physics2D.Raycast(e_attack, isRight ? Vector3.right : Vector3.left, 1, LayerMask.GetMask("Player"));
+            Debug.DrawRay(e_attack, isRight ? Vector3.left : Vector3.right, new Color(0, 0, 1));
+            backperception = Physics2D.Raycast(e_attack, isRight ? Vector3.left : Vector3.right, 1, LayerMask.GetMask("Player"));
+            //if (isRight == false) // 왼쪽일 때...
+            //{
+            //    Debug.DrawRay(e_attack, Vector3.left, new Color(1, 0, 0));
+            //    frontperception = Physics2D.Raycast(e_attack, Vector3.left, 1, LayerMask.GetMask("Player"));
+            //    Debug.DrawRay(e_attack, Vector3.right, new Color(0, 0, 1));
+            //    backperception = Physics2D.Raycast(e_attack, Vector3.right, 1, LayerMask.GetMask("Player"));
+            //}
+            //else
+            //{
+            //    Debug.DrawRay(e_attack, Vector3.right, new Color(1, 0, 0));
+            //    frontperception = Physics2D.Raycast(e_attack, Vector3.right, 1, LayerMask.GetMask("Player"));
+            //    Debug.DrawRay(e_attack, Vector3.left, new Color(0, 0, 1));
+            //    backperception = Physics2D.Raycast(e_attack, Vector3.left, 1, LayerMask.GetMask("Player"));
+            //}
+
+            //뒤에 플레이어 감지
+            if (backperception.collider != null)
+            {
+                //Debug.Log("뒤에 플레이어 감지");
+                isRight = isRight ? false : true;
+                transform.localScale = new Vector3(isRight ? 5f : -5f, 5, 1);
+            }
+        }
     }
+
+    void LateUpdate()
+    {
+        if (isAlive && frontperception.collider != null && attackCool <= 0f)
+        {
+            anim.SetTrigger("Attack");
+            StartCoroutine(WaitAttack());
+            attackCool = 5f;
+            if (attCoolCor == null)
+                attCoolCor = StartCoroutine(AttackCoolDown());
+        }
+        else
+        {
+            //isMove = true;
+            //anim.SetTrigger("Attack");
+        }
+    }
+
     void FixedUpdate()
     {
         if (isAlive)
         {
             if (isMove)
             {
-                if (isRight == true)
-                {
-                    movement = Vector3.right;
-                    transform.localScale = new Vector3(5, 5, 1);
-                    //rigid.velocity = new Vector2(1, rigid.velocity.y) * movepower;
-                    transform.Translate(movement * Time.fixedDeltaTime);
-                    HPBar.transform.localScale = new Vector3(0.02f, 0.02f, 1);
-                    text.transform.localScale = new Vector3(0.01f, 0.01f, 1);
-                }
-                else if (isRight == false)
-                {
-                    movement = Vector3.left;
-                    transform.localScale = new Vector3(-5, 5, 1);
-                    //rigid.velocity = new Vector2(-1, rigid.velocity.y) * movepower;
-                    transform.Translate(movement * Time.fixedDeltaTime);
-                    HPBar.transform.localScale = new Vector3(-0.02f, 0.02f, 1);
-                    text.transform.localScale = new Vector3(-0.01f, 0.01f, 1);
-                }
+                movement = isRight ? Vector3.right : Vector3.left;
+                transform.localScale = new Vector3(isRight ? 5 : -5, 5, 1);
+                transform.Translate(movement * Time.fixedDeltaTime * movepower);
+                HPBar.transform.localScale = new Vector3(isRight? 0.02f : -0.02f, 0.02f, 1);
+                text.transform.localScale = new Vector3(isRight? 0.03f : -0.03f, 0.01f, 1);
+                //if (isRight == true)
+                //{
+                //    movement = Vector3.right;
+                //    transform.localScale = new Vector3(5, 5, 1);
+                //    //rigid.velocity = new Vector2(1, rigid.velocity.y) * movepower;
+                //    transform.Translate(movement * Time.fixedDeltaTime);
+                //    HPBar.transform.localScale = new Vector3(0.02f, 0.02f, 1);
+                //    text.transform.localScale = new Vector3(0.03f, 0.01f, 1);
+                //}
+                //else if (isRight == false)
+                //{
+                //    movement = Vector3.left;
+                //    transform.localScale = new Vector3(-5, 5, 1);
+                //    //rigid.velocity = new Vector2(-1, rigid.velocity.y) * movepower;
+                //    transform.Translate(movement * Time.fixedDeltaTime);
+                //    HPBar.transform.localScale = new Vector3(-0.02f, 0.02f, 1);
+                //    text.transform.localScale = new Vector3(-0.03f, 0.01f, 1);
+                //}
             }
 
             //낭떠러지 앞에서 방향 전환
@@ -90,51 +154,20 @@ public class Monster : MonoBehaviour, AllInterface.IHit
             Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
             RaycastHit2D rayHit = Physics2D.Raycast(frontVec, Vector3.down, 1, LayerMask.GetMask("Ground"));
             if (rayHit.collider == null)
-            {
                 isRight = isRight ? false : true;
-            }
-
-            //공격범위
-            e_attack.x = rigid.position.x;
-            e_attack.y = rigid.position.y + 0.5f;
-
-            if (isRight == false) // 왼쪽일 때...
-            {
-                Debug.DrawRay(e_attack, Vector3.left, new Color(1, 0, 0));
-                frontperception = Physics2D.Raycast(e_attack, Vector3.left, 1, LayerMask.GetMask("Player"));
-                Debug.DrawRay(e_attack, Vector3.right, new Color(0, 0, 1));
-                backperception = Physics2D.Raycast(e_attack, Vector3.right, 1, LayerMask.GetMask("Player"));
-            }
-            else
-            {
-                Debug.DrawRay(e_attack, Vector3.right, new Color(1, 0, 0));
-                frontperception = Physics2D.Raycast(e_attack, Vector3.right, 1, LayerMask.GetMask("Player"));
-                Debug.DrawRay(e_attack, Vector3.left, new Color(0, 0, 1));
-                backperception = Physics2D.Raycast(e_attack, Vector3.left, 1, LayerMask.GetMask("Player"));
-            }
-            //뒤에 플레이어 감지
-            if (backperception.collider != null)
-            {
-                //Debug.Log("뒤에 플레이어 감지");
-                isRight = isRight ? false : true;
-            }
-
-            if (frontperception.collider != null)
-            {
-                isMove = false;
-                anim.SetBool("Attack", true);
-            }
-            else
-            {
-                isMove = true;
-                anim.SetBool("Attack", false);
-            }
+            else if (transform.position.x > 73)
+                isRight = false;
         }
+    }
+
+    public void Attack()
+    {
+        if (frontperception.collider != null && GameManager.Instance.player.isRoll == false && GameManager.Instance.player.isAlive)
+            frontperception.collider.transform.GetComponent<Player>().Hit(enemy_stat.Att, transform.position);
     }
 
     //void LateUpdate()
     //{
-
     //}
 
     //void Move()
@@ -183,7 +216,7 @@ public class Monster : MonoBehaviour, AllInterface.IHit
     //        }
     //    }
     //}
-     
+
     //private void OnCollisionEnter2D(Collision2D collision) 
     //{
     //    if (collision.gameObject.CompareTag("Player"))
@@ -218,14 +251,21 @@ public class Monster : MonoBehaviour, AllInterface.IHit
     public void SetInfo(Vector3 pos)
     {
         transform.position = pos;
+        enemy_stat.MaxHP = GameManager.Instance.player.myStat.Att * 5; // 플레이어의 공격력으로 5번 맞으면 죽도록 생성
         enemy_stat.HP = enemy_stat.MaxHP;
+        enemy_stat.Att = GameManager.Instance.player.myStat.MaxHP / 10; // 플레이어가 10번 맞으면 죽도록 생성
+
+        HPBar.maxValue = enemy_stat.MaxHP;
+        HPBar.value = enemy_stat.HP;
+
         if (col == null)
-        {
             col = GetComponent<CapsuleCollider2D>();
-        }
+
         col.enabled = true;
+
         if (rigid == null)
             rigid = GetComponent<Rigidbody2D>();
+
         rigid.gravityScale = 1;
     }
 
@@ -237,34 +277,73 @@ public class Monster : MonoBehaviour, AllInterface.IHit
         col.enabled = false;
         StartCoroutine(WaitEnque());
         Debug.Log("몬스터 사망");
-
+        GameManager.Instance.player.killCount++;
+        UIManager.Instance.killCountUpdate();
+        if (Random.Range(0, 6) == 3)
+            GameManager.Instance.player.potionNum++;
+        UIManager.Instance.PotionNumUpdate();
         //Destroy(gameObject); // HP = 0일시 없어짐
 
     }
     public void Hit(float damage, Vector2 pos)
     {
         enemy_stat.HP = Mathf.Clamp(enemy_stat.HP - damage, 0f, enemy_stat.MaxHP);
-        //#region 넉백될 벡터 구하기
-        //Vector2 KnockVec = Vector2.zero;
-        //KnockVec = (Vector2)transform.position - pos;
-        //bool dirIsLeft = KnockVec.x < 0f;
-        //KnockVec = dirIsLeft ? Vector2.left : Vector2.right;
-        //KnockVec.y = 0.5f;
-        //#endregion
+        text.text = $"{enemy_stat.HP} / {enemy_stat.MaxHP}";
+        HPBar.value = enemy_stat.HP;
 
         if (isAlive == false)
             Die();
         else
         {
+            if (isAttack == false)
+                anim.SetTrigger("Hit");
+            StartCoroutine(WaitHit());
+            //#region 넉백될 벡터 구하기
+            //Vector2 KnockVec = Vector2.zero;
+            //KnockVec = (Vector2)transform.position - pos;
+            //bool dirIsLeft = KnockVec.x < 0f;
+            //KnockVec = dirIsLeft ? Vector2.left : Vector2.right;
+            //KnockVec.y = 0.5f;
+            //#endregion
             //rigid.velocity = KnockVec;
-            anim.SetTrigger("Hit");
         }
-            
     }
 
-    IEnumerator WaitEnque()
+    IEnumerator WaitEnque() // 죽고 10초후에 몬스터스포너의 큐로 돌아감
     {
         yield return new WaitForSeconds(10f);
         MonsterSpawner.Instance.MonsterEnqueue(this.gameObject);
+    }
+    IEnumerator WaitAttack()
+    {
+        isAttack = true;
+        isMove = false;
+        yield return new WaitForSeconds(1f);
+        isAttack = false;
+        isMove = true;
+    }
+    IEnumerator WaitHit()
+    {
+        isHit = true;
+        isMove = false;
+        anim.SetBool("Walk", false);
+        yield return new WaitForSeconds(1f);
+        isHit = false;
+        isMove = true;
+        anim.SetBool("Walk", true);
+    }
+    IEnumerator AttackCoolDown()
+    {
+        while (attackCool > 0f)
+        {
+            attackCool -= 0.1f;
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        if (attackCool <= 0f)
+        {
+            StopCoroutine(attCoolCor);
+            attCoolCor = null;
+        }
     }
 }

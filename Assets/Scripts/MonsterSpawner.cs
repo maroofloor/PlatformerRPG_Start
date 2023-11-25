@@ -19,15 +19,13 @@ public class MonsterSpawner : Singleton<MonsterSpawner>
 
         for (int i = 0; i < 10; i++)
         {
-            GameObject tmp = Instantiate(monsterPrefab);
+            GameObject tmp = Instantiate(monsterPrefab, this.transform);
             tmp.gameObject.SetActive(false);
             MonsterQueue.Enqueue(tmp);
         }
 
         if (points.Length > 0)
-        {
             StartCoroutine(CreateMonster());
-        }
     }
 
     void ActiveMonster()
@@ -37,11 +35,11 @@ public class MonsterSpawner : Singleton<MonsterSpawner>
         {
             GameObject tmp = MonsterQueue.Dequeue();
             tmp.GetComponent<Monster>().SetInfo(points[area].position);
+            tmp.SetActive(true);
             //tmp.transform.position = ;
             //tmp.GetComponent<Monster>().enemy_stat.HP = tmp.GetComponent<Monster>().enemy_stat.MaxHP;
             //if (tmp.GetComponent<Monster>().col.enabled == false)
             //    tmp.GetComponent<Monster>().col.enabled = true;
-            tmp.SetActive(true);
         }
         else
             return;

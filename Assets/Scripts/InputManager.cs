@@ -47,6 +47,8 @@ public class InputManager : MonoBehaviour
                 player.Attack();
             if (Input.GetKeyDown(KeyCode.X))
                 player.Roll();
+            if (Input.GetKeyDown(KeyCode.Q))
+                player.UsePotion();
         }
     }
 

@@ -23,10 +23,18 @@ public class UIManager : Singleton<UIManager>
     [SerializeField]
     Transform warningMsgTr;
     Text warningInfoTxt;
+    [SerializeField]
+    Text killCountTxt;
+    [SerializeField]
+    Text potionNumTxt;
+    [SerializeField]
+    Text EnforceNumTxt;
     public Transform mobileControllerTr;
 
     bool isMenuOn;
     bool isEnforceOn;
+
+    int enforceNum => (GameManager.Instance.player.killCount - (GameManager.Instance.player.killCount % 10)) / 10;
 
     void Start()
     {
@@ -50,6 +58,21 @@ public class UIManager : Singleton<UIManager>
 
         if (Input.GetKeyDown(KeyCode.B))
             UI_EnforceBotton();
+    }
+
+    public void killCountUpdate()
+    {
+        killCountTxt.text = "Kill : " + string.Format("{0:000}", player.killCount);
+    }
+
+    public void PotionNumUpdate()
+    {
+        potionNumTxt.text = "x " + string.Format("{0:00}", player.potionNum);
+    }
+
+    public void EnforceNumUpdate()
+    {
+        EnforceNumTxt.text = "강화 개수 : " + string.Format("{0:00}", enforceNum);
     }
 
     public void PrintWarningMsg(string Msg)
@@ -90,11 +113,11 @@ public class UIManager : Singleton<UIManager>
             uiMenuTr.gameObject.SetActive(true);
             isMenuOn = true;
         }
-
     }
 
     public void UI_EnforceBotton()
     {
+        EnforceNumUpdate();
         if (!isMenuOn)
         {
             if (isEnforceOn)
