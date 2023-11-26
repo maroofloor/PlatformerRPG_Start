@@ -49,6 +49,17 @@ public class InputManager : MonoBehaviour
                 player.Roll();
             if (Input.GetKeyDown(KeyCode.Q))
                 player.UsePotion();
+            if (Input.GetKeyDown(KeyCode.B))
+                UIManager.Instance.UI_EnforceBotton();
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (UIManager.Instance.GetIsEnforceOn())
+                {
+                    UIManager.Instance.UI_EnforceBotton();
+                    return;
+                }
+                UIManager.Instance.UI_MenuBotton();
+            }
         }
     }
 

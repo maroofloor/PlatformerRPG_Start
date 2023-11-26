@@ -6,22 +6,30 @@ public class Portal : MonoBehaviour
 {
     [SerializeField]
     Transform portalPosTr;
-    Vector2 portalPosVec;
 
     [SerializeField]
     bool OnPotral;
 
     void Start()
     {
-        portalPosVec = portalPosTr.position;
         OnPotral = false;
+    }
+
+    public void PortalYes()
+    {
+        GameManager.Instance.player.transform.position = portalPosTr.position;
+        UIManager.Instance.PrintPortalInfo();
+    }
+    public void PortalNo()
+    {
+        UIManager.Instance.PrintPortalInfo();
     }
 
     void Update()
     {
         if (OnPotral && Input.GetKeyDown(KeyCode.DownArrow))
         {
-            GameManager.Instance.player.transform.position = portalPosVec;
+            UIManager.Instance.PrintPortalInfo();
         }
     }
 

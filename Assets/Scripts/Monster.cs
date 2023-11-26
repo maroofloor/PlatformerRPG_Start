@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public class Monster : MonoBehaviour, AllInterface.IHit
 {
+    public int areaNum;
     public float movepower = 1f;
     Animator anim;
     Vector3 movement = Vector3.zero;
@@ -28,6 +29,9 @@ public class Monster : MonoBehaviour, AllInterface.IHit
     RaycastHit2D frontperception;
     RaycastHit2D backperception;
 
+    public Coroutine cor = null;
+    bool isDetect;
+    Vector3 chaseDirVec = Vector3.zero;
 
     void Start()
     {
@@ -36,17 +40,17 @@ public class Monster : MonoBehaviour, AllInterface.IHit
         HPBar.value = enemy_stat.HP;
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        StartCoroutine(Changemovement());
         isRight = true;
         col = GetComponent<CapsuleCollider2D>();
         isAttack = false;
         isHit = false;
+        isDetect = false;
         attackCool = 0f;
+        if (cor == null)
+            cor = StartCoroutine(Changemovement());
     }
 
-
-
-    IEnumerator Changemovement()
+    public IEnumerator Changemovement()
     {
         while (isAlive)
         {
@@ -59,11 +63,16 @@ public class Monster : MonoBehaviour, AllInterface.IHit
             isRight = Random.Range(0, 2) == 0 ? true : false;
             yield return new WaitForSeconds(Random.Range(1f, 1.5f));
         }
+        if (isAlive == false && cor != null)
+        {
+            StopCoroutine(cor);
+            cor = null;
+        }
     }
 
     void Update()
     {
-        if (isAlive)
+        if (isAlive && GameManager.Instance.player.isAlive)
         {
             text.text = $"{enemy_stat.HP} / {enemy_stat.MaxHP}";
             HPBar.value = enemy_stat.HP;
@@ -74,8 +83,8 @@ public class Monster : MonoBehaviour, AllInterface.IHit
 
             Debug.DrawRay(e_attack, isRight ? Vector3.right : Vector3.left, new Color(1, 0, 0));
             frontperception = Physics2D.Raycast(e_attack, isRight ? Vector3.right : Vector3.left, 1, LayerMask.GetMask("Player"));
-            Debug.DrawRay(e_attack, isRight ? Vector3.left : Vector3.right, new Color(0, 0, 1));
-            backperception = Physics2D.Raycast(e_attack, isRight ? Vector3.left : Vector3.right, 1, LayerMask.GetMask("Player"));
+            //Debug.DrawRay(e_attack, isRight ? Vector3.left : Vector3.right, new Color(0, 0, 1));
+            //backperception = Physics2D.Raycast(e_attack, isRight ? Vector3.left : Vector3.right, 1, LayerMask.GetMask("Player"));
             //if (isRight == false) // 왼쪽일 때...
             //{
             //    Debug.DrawRay(e_attack, Vector3.left, new Color(1, 0, 0));
@@ -91,13 +100,13 @@ public class Monster : MonoBehaviour, AllInterface.IHit
             //    backperception = Physics2D.Raycast(e_attack, Vector3.left, 1, LayerMask.GetMask("Player"));
             //}
 
-            //뒤에 플레이어 감지
-            if (backperception.collider != null)
-            {
-                //Debug.Log("뒤에 플레이어 감지");
-                isRight = isRight ? false : true;
-                transform.localScale = new Vector3(isRight ? 5f : -5f, 5, 1);
-            }
+            ////뒤에 플레이어 감지
+            //if (backperception.collider != null && isHit ==false)
+            //{
+            //    //Debug.Log("뒤에 플레이어 감지");
+            //    isRight = isRight ? false : true;
+            //    transform.localScale = new Vector3(isRight ? 5f : -5f, 5, 1);
+            //}
         }
     }
 
@@ -107,9 +116,10 @@ public class Monster : MonoBehaviour, AllInterface.IHit
         {
             anim.SetTrigger("Attack");
             StartCoroutine(WaitAttack());
-            attackCool = 5f;
+            attackCool = 5f; // 몬스터의 공격쿨타임 5초
             if (attCoolCor == null)
                 attCoolCor = StartCoroutine(AttackCoolDown());
+            isDetect = true;
         }
         else
         {
@@ -120,15 +130,25 @@ public class Monster : MonoBehaviour, AllInterface.IHit
 
     void FixedUpdate()
     {
-        if (isAlive)
+        if (isDetect && Vector3.Distance(GameManager.Instance.player.transform.position, transform.position) > 6f)
         {
-            if (isMove)
+            isDetect = false;
+        }
+
+        // 낭떠러지 감지
+        Vector2 frontVec = new Vector2(rigid.position.x + (isRight ? 0.5f : -0.5f), rigid.position.y);
+        Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
+        RaycastHit2D rayHit = Physics2D.Raycast(frontVec, Vector3.down, 1, LayerMask.GetMask("Ground"));
+
+        if (isAlive && isDetect == false)
+        {
+            if (isMove && isHit == false && isAttack == false)
             {
+                if (anim.GetBool("Walk") == false)
+                    anim.SetBool("Walk", true);
                 movement = isRight ? Vector3.right : Vector3.left;
-                transform.localScale = new Vector3(isRight ? 5 : -5, 5, 1);
                 transform.Translate(movement * Time.fixedDeltaTime * movepower);
-                HPBar.transform.localScale = new Vector3(isRight? 0.02f : -0.02f, 0.02f, 1);
-                text.transform.localScale = new Vector3(isRight? 0.03f : -0.03f, 0.01f, 1);
+                
                 //if (isRight == true)
                 //{
                 //    movement = Vector3.right;
@@ -150,19 +170,45 @@ public class Monster : MonoBehaviour, AllInterface.IHit
             }
 
             //낭떠러지 앞에서 방향 전환
-            Vector2 frontVec = new Vector2(rigid.position.x + (isRight ? 0.5f : -0.5f), rigid.position.y);
-            Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
-            RaycastHit2D rayHit = Physics2D.Raycast(frontVec, Vector3.down, 1, LayerMask.GetMask("Ground"));
             if (rayHit.collider == null)
                 isRight = isRight ? false : true;
             else if (transform.position.x > 73)
                 isRight = false;
         }
+        else if (isAlive && isDetect) // 플레이어를 감지하면 플레이어를 따라다님
+        {
+            if (cor != null)
+            {
+                StopCoroutine(cor);
+                cor = null;
+            }
+            isRight = chaseDirVec.x > 0f;
+            if (rayHit.collider != null)
+            {
+                if (isAttack == false && isHit == false)
+                {
+                    isMove = true;
+                    anim.SetBool("Walk", true);
+                    chaseDirVec = GameManager.Instance.player.transform.position - transform.position;
+                    chaseDirVec.y = 0;
+                    transform.Translate(chaseDirVec.normalized * Time.fixedDeltaTime);
+                }
+            }
+            else
+            {
+                isRight = isRight ? false : true;
+                isMove = false;
+                anim.SetBool("Walk", false);
+            }
+        }
+        transform.localScale = new Vector3(isRight ? 5 : -5, 5, 1);
+        HPBar.transform.localScale = new Vector3(isRight ? 0.02f : -0.02f, 0.02f, 1);
+        text.transform.localScale = new Vector3(isRight ? 0.03f : -0.03f, 0.01f, 1);
     }
 
     public void Attack()
     {
-        if (frontperception.collider != null && GameManager.Instance.player.isRoll == false && GameManager.Instance.player.isAlive)
+        if (frontperception.collider != null && GameManager.Instance.player.GetIsRoll() == false && GameManager.Instance.player.GetIsHit() == false)
             frontperception.collider.transform.GetComponent<Player>().Hit(enemy_stat.Att, transform.position);
     }
 
@@ -267,6 +313,8 @@ public class Monster : MonoBehaviour, AllInterface.IHit
             rigid = GetComponent<Rigidbody2D>();
 
         rigid.gravityScale = 1;
+        transform.GetChild(0).gameObject.SetActive(true);
+        isDetect = false;
     }
 
     void Die()
@@ -277,11 +325,12 @@ public class Monster : MonoBehaviour, AllInterface.IHit
         col.enabled = false;
         StartCoroutine(WaitEnque());
         Debug.Log("몬스터 사망");
-        GameManager.Instance.player.killCount++;
+        GameManager.Instance.player.AddKillCount();
         UIManager.Instance.killCountUpdate();
         if (Random.Range(0, 6) == 3)
-            GameManager.Instance.player.potionNum++;
+            GameManager.Instance.player.AddPotionNum();
         UIManager.Instance.PotionNumUpdate();
+        transform.GetChild(0).gameObject.SetActive(false);
         //Destroy(gameObject); // HP = 0일시 없어짐
 
     }
@@ -295,9 +344,10 @@ public class Monster : MonoBehaviour, AllInterface.IHit
             Die();
         else
         {
+            StartCoroutine(WaitHit());
             if (isAttack == false)
                 anim.SetTrigger("Hit");
-            StartCoroutine(WaitHit());
+            isDetect = true;
             //#region 넉백될 벡터 구하기
             //Vector2 KnockVec = Vector2.zero;
             //KnockVec = (Vector2)transform.position - pos;

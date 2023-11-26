@@ -30,21 +30,42 @@ public class UIManager : Singleton<UIManager>
     [SerializeField]
     Text EnforceNumTxt;
     public Transform mobileControllerTr;
+    [SerializeField]
+    Transform uiPortalTr;
+    [SerializeField]
+    Transform LifeHeartTr;
 
     bool isMenuOn;
     bool isEnforceOn;
+    bool isPortalInfoOn;
 
-    int enforceNum => (GameManager.Instance.player.killCount - (GameManager.Instance.player.killCount % 10)) / 10;
+    public bool GetIsMenuOn()
+    {
+        return isMenuOn;
+    }
+    public bool GetIsEnforceOn()
+    {
+        return isEnforceOn;
+    }
+
+    public void MinusLife(int lifeNum)
+    {
+        LifeHeartTr.GetChild(lifeNum).gameObject.SetActive(false);
+    }
+
+    int enforceNum => (GameManager.Instance.player.GetKillCount() - (GameManager.Instance.player.GetKillCount() % 10)) / 10;
 
     void Start()
     {
         isMenuOn = false;
         isEnforceOn = false;
+        isPortalInfoOn = false;
         warningInfoTxt = warningMsgTr.GetChild(0).GetComponent<Text>();
         warningMsgTr.gameObject.SetActive(false);
         uiMenuTr.gameObject.SetActive(false);
         uiEnforceTr.gameObject.SetActive(false);
         mobileControllerTr.gameObject.SetActive(true);
+        uiPortalTr.gameObject.SetActive(false);
     }
 
     void Update()
@@ -52,22 +73,16 @@ public class UIManager : Singleton<UIManager>
         AttTxt.text = "Att : " + string.Format("{0:0000}", player.myStat.Att);
         DefTxt.text = "Def : " + string.Format("{0:0000}", player.myStat.Def);
         HPTxt.text = "H P : " + string.Format("{0:0000}", player.myStat.MaxHP);
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-            UI_MenuBotton();
-
-        if (Input.GetKeyDown(KeyCode.B))
-            UI_EnforceBotton();
     }
 
     public void killCountUpdate()
     {
-        killCountTxt.text = "Kill : " + string.Format("{0:000}", player.killCount);
+        killCountTxt.text = "Kill : " + string.Format("{0:000}", player.GetKillCount());
     }
 
     public void PotionNumUpdate()
     {
-        potionNumTxt.text = "x " + string.Format("{0:00}", player.potionNum);
+        potionNumTxt.text = "x " + string.Format("{0:00}", player.GetPotionNum());
     }
 
     public void EnforceNumUpdate()
@@ -107,12 +122,26 @@ public class UIManager : Singleton<UIManager>
         }
         else // 강화창이 켜져있는 경우에는
         {
-            uiEnforceTr.gameObject.SetActive(false); // 강화창을 끄고 메뉴 켜기
+            uiEnforceTr.gameObject.SetActive(false);
             isEnforceOn = false;
-
             uiMenuTr.gameObject.SetActive(true);
             isMenuOn = true;
         }
+    }
+
+    public void PrintPortalInfo()
+    {
+        if (isPortalInfoOn == false)
+        {
+            isPortalInfoOn = true;
+            uiPortalTr.gameObject.SetActive(true);
+        }
+        else
+        {
+            isPortalInfoOn = false;
+            uiPortalTr.gameObject.SetActive(false);
+        }
+        
     }
 
     public void UI_EnforceBotton()
@@ -136,8 +165,7 @@ public class UIManager : Singleton<UIManager>
         else // 메뉴가 켜져있는 경우에는
         {
             uiMenuTr.gameObject.SetActive(false);
-            isMenuOn = false; // 메뉴를 끄고 강화창 켜기
-
+            isMenuOn = false;
             uiEnforceTr.gameObject.SetActive(true);
             isEnforceOn = true;
         }

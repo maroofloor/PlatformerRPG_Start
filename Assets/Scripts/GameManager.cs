@@ -15,6 +15,14 @@ public class GameManager : Singleton<GameManager>
     Image RollCoolImg;
     float rollMaxCool = 3f;
     public InputManager inputManager;
+    
+    [SerializeField]
+    Transform gameOverTr;
+    Text deadTxt;
+    Button reviveBut;
+    Color overBackColor = Color.black;
+    Color deadTxtColor = new Color(0.6f, 0f, 0f, 1f);
+    Coroutine fadeCor = null;
 
     float[] enforceAtt = new float[11] { 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 600 };
     float[] enforceDef = new float[11] { 0, 2, 6, 12, 20, 30, 42, 56, 72, 90, 550 };
@@ -23,6 +31,14 @@ public class GameManager : Singleton<GameManager>
     private void Start()
     {
         player.gameObject.SetActive(true);
+        deadTxt = gameOverTr.GetChild(0).GetComponent<Text>();
+        reviveBut = gameOverTr.GetChild(1).GetComponent<Button>();
+        overBackColor.a = 0f;
+        gameOverTr.GetComponent<Image>().color = overBackColor;
+        deadTxtColor.a = 0f;
+        deadTxt.color = deadTxtColor;
+        reviveBut.gameObject.SetActive(false);
+        gameOverTr.gameObject.SetActive(false);
     }
     void Update()
     {
@@ -40,7 +56,7 @@ public class GameManager : Singleton<GameManager>
     public void EnforceStat(int enforceNum)
     {
         AllEnum.EnforceType enforceType = (AllEnum.EnforceType)enforceNum;
-        if (player.killCount >= 10)
+        if (player.GetKillCount() >= 10)
         {
             switch (enforceType)
             {
@@ -51,7 +67,7 @@ public class GameManager : Singleton<GameManager>
                         {
                             player.myStat.Att = enforceAtt[i];
                             UIManager.Instance.PrintWarningMsg($"강화 개수를 사용하여 공격력을 강화 합니다.\n{enforceAtt[i - 1]} -> {enforceAtt[i]}");
-                            player.killCount -= 10;
+                            player.RemoveKillCount();
                             UIManager.Instance.killCountUpdate();
                             UIManager.Instance.EnforceNumUpdate();
                             return;
@@ -65,7 +81,7 @@ public class GameManager : Singleton<GameManager>
                         {
                             player.myStat.Def = enforceDef[i];
                             UIManager.Instance.PrintWarningMsg($"강화 개수를 사용하여 방어력을 강화 합니다.\n{enforceDef[i - 1]} -> {enforceDef[i]}");
-                            player.killCount -= 10;
+                            player.RemoveKillCount();
                             UIManager.Instance.killCountUpdate();
                             UIManager.Instance.EnforceNumUpdate();
                             return;
@@ -80,7 +96,7 @@ public class GameManager : Singleton<GameManager>
                             player.myStat.MaxHP = enforceHP[i];
                             player.myStat.HP += enforceHP[i] - enforceHP[i - 1]; // 증가한 값 만큼 HP에 더하기
                             UIManager.Instance.PrintWarningMsg($"강화 개수를 사용하여 최대체력을 강화 합니다.\n{enforceHP[i - 1]} -> {enforceHP[i]}");
-                            player.killCount -= 10;
+                            player.RemoveKillCount();
                             UIManager.Instance.killCountUpdate();
                             UIManager.Instance.EnforceNumUpdate();
                             return;
@@ -113,5 +129,53 @@ public class GameManager : Singleton<GameManager>
                 return -1;
         }
         return value;
+    }
+
+    public void PrintDeadScreen()
+    {
+        if (fadeCor == null)
+            fadeCor = StartCoroutine(FadeInDeadScreen());
+    }
+
+    public void ExitDeadScreen()
+    {
+        overBackColor.a = 0f;
+        gameOverTr.GetComponent<Image>().color = overBackColor;
+        deadTxtColor.a = 0f;
+        deadTxt.color = deadTxtColor;
+        reviveBut.gameObject.SetActive(false);
+        gameOverTr.gameObject.SetActive(false);
+    }
+
+    IEnumerator FadeInDeadScreen()
+    {
+        yield return new WaitForSeconds(2f);
+        gameOverTr.gameObject.SetActive(true);
+        while (overBackColor.a < 1f)
+        {
+            overBackColor.a = Mathf.Clamp(overBackColor.a + Time.fixedDeltaTime, 0, 1);
+            gameOverTr.GetComponent<Image>().color = overBackColor;
+            yield return new WaitForFixedUpdate();
+        }
+        if (overBackColor.a == 1f)
+        {
+            while (deadTxtColor.a < 1f)
+            {
+                deadTxtColor.a = Mathf.Clamp(deadTxtColor.a + Time.fixedDeltaTime, 0, 1);
+                deadTxt.color = deadTxtColor;
+                yield return new WaitForFixedUpdate();
+            }
+        }
+        if (deadTxtColor.a == 1f)
+        {
+            yield return new WaitForSeconds(1f);
+            reviveBut.gameObject.SetActive(true);
+        }
+
+        if (fadeCor != null)
+        {
+            StopCoroutine(fadeCor);
+            fadeCor = null;
+        }
     }
 }

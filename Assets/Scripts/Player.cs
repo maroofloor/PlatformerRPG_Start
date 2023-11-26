@@ -17,23 +17,56 @@ public class Player : MonoBehaviour, AllInterface.IHit
 
     public AllStruct.Stat myStat; // 플레이어의 스탯(구조체)... scripts폴더에 AllStruct스크립트...
 
-    public int potionNum; // 플레이어가 소유한 포션의 개수
+    int Life;
+    public int GetLife()
+    {
+        return Life;
+    }
+    int potionNum; // 플레이어가 소유한 포션의 개수
+    public int GetPotionNum()
+    {
+        return potionNum;
+    }
+    public void AddPotionNum()
+    {
+        potionNum++;
+    }
 
     bool isMove => vec.x != 0f; // vec.x가 0이 아니라면 플레이어가 이동키를 입력중...
-    public bool isLeft;
+    bool isLeft;
     bool isJump; // 체공중일 때 true
     bool isAttack1; // 공격 1번 모션중일 때 true
     bool isAttack2; // 공격 2번 모션중일 때 true
-    public bool isRoll; // 구르는 모션중일 때 true
+    bool isRoll; // 구르는 모션중일 때 true
+    public bool GetIsRoll()
+    {
+        return isRoll;
+    }
+
     public bool isAlive => myStat.HP > 0; // HP가 0보다 크면 살아있음
     bool isHit;
+    public bool GetIsHit()
+    {
+        return isHit;
+    }
 
     int attackNum = 0; // 공격콤보
     int jumpNum = 0; // 점프 횟수
     float speed = 6; // 플레이어 속도
 
     [SerializeField]
-    public int killCount;
+    int killCount;
+    public int GetKillCount()
+    {
+        return killCount;
+    }
+    public void AddKillCount()
+    {
+        killCount++;
+    }public void RemoveKillCount()
+    {
+        killCount -= 10;
+    }
 
     //LayerMask playerLayer;
     //Vector2 pointVec;
@@ -60,6 +93,26 @@ public class Player : MonoBehaviour, AllInterface.IHit
         //playerLayer = 1 << LayerMask.NameToLayer("Player");
         rayVec = Vector2.zero;
         killCount = 0;
+        Life = 3;
+    }
+
+    public void Revive()
+    {
+        if (Life > 0)
+        {
+            Life--;
+            UIManager.Instance.MinusLife(Life);
+        }
+        else
+        {
+            UIManager.Instance.PrintWarningMsg("남은 라이프가 없어 부활할 수 없습니다.");
+            return;
+        }
+
+        transform.position = Vector3.zero;
+        anim.SetTrigger("IsRevive");
+        myStat.HP = myStat.MaxHP;
+        GameManager.Instance.ExitDeadScreen();
     }
 
     public void Jump()
@@ -113,22 +166,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
     void Update()
     {
         Debug.DrawRay(new Vector2(transform.position.x, transform.position.y + 0.5f), (isLeft ? Vector2.left : Vector2.right) * 2f, new Color(1, 0, 0));
-        
-        //pointVec.x = transform.position.x + 2f * (isLeft ? -1f : 1f);
-        //pointVec.y = transform.position.y + 1.5f;
-        //Debug.DrawLine(transform.position, pointVec);
-        //hits = Physics2D.OverlapAreaAll(transform.position, pointVec, enemyLayer);
 
-        //if (Input.GetKeyDown(KeyCode.Space))
-        //{
-        //    myStat.HP -= 10f;
-        //    Debug.Log("플레이어 체력 : " + myStat.HP + " / " + myStat.MaxHP);
-        //    if (!isAlive)
-        //        anim.SetTrigger("IsDeath"); // HP 가 0보다 높으면 true, 낮으면 false...
-        //}
-    }
-    void LateUpdate()
-    {
         if (vec.x != 0 && !isAttack1 && !isAttack2 && isAlive && !isJump && !isRoll && !isHit)
         {
             scaleVec.x = vec.x; // scaleVec이 기본으로 Vector3.one(1, 1, 1)이기 때문에 x만 -1 혹은 1로 바꾸면...
@@ -139,6 +177,12 @@ public class Player : MonoBehaviour, AllInterface.IHit
                 isLeft = false;
         }
         anim.SetBool("IsMove", isMove); // vec.x가 0이 아닐 때 isMove가 true, 0이면 false...
+
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    Hit(10 ,transform.position);
+        //    Debug.Log("플레이어 체력 : " + myStat.HP + " / " + myStat.MaxHP);
+        //}
     }
 
     private void FixedUpdate()
@@ -157,7 +201,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
             {
                 jumpNum = 0;
                 jumpVec = Vector3.zero;
-                rigid.velocity = Vector3.zero; // 없으면 캐릭터가 공격중 착지했을때에 이동이 가능한데 모션이 이상함...
+                rigid.velocity = Vector3.zero; // 없으면 캐릭터가 공격중 착지했을때에 미끄러짐
             }
         }
         else if (collision.gameObject.CompareTag("Enemy"))
@@ -222,12 +266,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
         rollVec.x = isLeft ? -1f : 1f;
         rigid.velocity = rollVec * 8;
         yield return new WaitForSeconds(1f);
-        if (!isJump)
-        {
-            rollVec.x = 0f;
-            rigid.velocity = rollVec;
-        }
-        else
+        if (isJump) // 공중에 있으면 점프 못하도록
             jumpNum += 2;
         isRoll = false;
         Physics2D.IgnoreLayerCollision(3, 6, false);
@@ -267,8 +306,9 @@ public class Player : MonoBehaviour, AllInterface.IHit
 
             if (!isAlive)
             {
-                anim.SetTrigger("IsDeath");
                 Physics2D.IgnoreLayerCollision(3, 6);
+                anim.SetTrigger("IsDeath");
+                GameManager.Instance.PrintDeadScreen();
             }
             else
             {
@@ -284,7 +324,9 @@ public class Player : MonoBehaviour, AllInterface.IHit
         Physics2D.IgnoreLayerCollision(3, 6);
         yield return new WaitForSeconds(1f);
         isHit = false;
-        Physics2D.IgnoreLayerCollision(3, 6, false);
+        if (isAlive)
+            Physics2D.IgnoreLayerCollision(3, 6, false);
+
         rigid.velocity = Vector2.zero;
     }
 
@@ -294,6 +336,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
         {
             potionNum--;
             myStat.HP = Mathf.Clamp(myStat.HP + (int)(myStat.MaxHP * 0.3f), 0, myStat.MaxHP);
+            UIManager.Instance.PotionNumUpdate();
         }
         else
         {
