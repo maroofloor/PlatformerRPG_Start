@@ -21,14 +21,14 @@ AnimationClip:
   - curve:
     - time: 0
       value: {fileID: 21300000, guid: ddf8838d0a06d8d4c9dec9e3bed69260, type: 3}
-    - time: 1.6666666
+    - time: 0.6666667
       value: {fileID: 21300002, guid: ddf8838d0a06d8d4c9dec9e3bed69260, type: 3}
-    - time: 1.8333334
+    - time: 0.8333333
       value: {fileID: 21300004, guid: ddf8838d0a06d8d4c9dec9e3bed69260, type: 3}
-    - time: 2
+    - time: 1
       value: {fileID: 21300006, guid: ddf8838d0a06d8d4c9dec9e3bed69260, type: 3}
     attribute: m_Sprite
-    path: potionImg
+    path: ButtonPotion
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_SampleRate: 12
@@ -39,7 +39,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 2498295860
+      path: 1418671901
       attribute: 2015549526
       script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
       typeID: 114
@@ -55,7 +55,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 2.0833333
+    m_StopTime: 1.0833334
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
