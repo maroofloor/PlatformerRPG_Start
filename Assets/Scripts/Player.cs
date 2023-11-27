@@ -198,7 +198,12 @@ public class Player : MonoBehaviour, AllInterface.IHit
             }
         }
         else if (collision.gameObject.CompareTag("Enemy"))
-            Hit(collision.transform.GetComponent<Monster>().enemy_stat.Att, collision.transform.position);
+        {
+            if (collision.transform.TryGetComponent<Boss>(out Boss boss))
+                Hit(collision.transform.GetComponent<Boss>().Boss_stat.Att, collision.transform.position);
+            else
+                Hit(collision.transform.GetComponent<Monster>().enemy_stat.Att, collision.transform.position);
+        }
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
