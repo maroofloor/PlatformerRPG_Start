@@ -22,6 +22,10 @@ public class Player : MonoBehaviour, AllInterface.IHit
     {
         return Life;
     }
+    public void SetLife(int life)
+    {
+        Life = life;
+    }
     int potionNum; // 플레이어가 소유한 포션의 개수
     public int GetPotionNum()
     {
@@ -30,6 +34,10 @@ public class Player : MonoBehaviour, AllInterface.IHit
     public void AddPotionNum()
     {
         potionNum++;
+    }
+    public void SetPotionNum(int potionNum)
+    {
+        this.potionNum = potionNum;
     }
 
     bool isMove => vec.x != 0f; // vec.x가 0이 아니라면 플레이어가 이동키를 입력중...
@@ -67,6 +75,10 @@ public class Player : MonoBehaviour, AllInterface.IHit
     {
         killCount -= 10;
     }
+    public void SetKillCount(int killCount)
+    {
+        this.killCount = killCount;
+    }
 
     //LayerMask playerLayer;
     //Vector2 pointVec;
@@ -94,25 +106,6 @@ public class Player : MonoBehaviour, AllInterface.IHit
         rayVec = Vector2.zero;
         killCount = 0;
         Life = 3;
-    }
-
-    public void Revive()
-    {
-        if (Life > 0)
-        {
-            Life--;
-            UIManager.Instance.MinusLife(Life);
-        }
-        else
-        {
-            UIManager.Instance.PrintWarningMsg("남은 라이프가 없어 부활할 수 없습니다.");
-            return;
-        }
-
-        transform.position = Vector3.zero;
-        anim.SetTrigger("IsRevive");
-        myStat.HP = myStat.MaxHP;
-        GameManager.Instance.ExitDeadScreen();
     }
 
     public void Jump()
@@ -178,11 +171,11 @@ public class Player : MonoBehaviour, AllInterface.IHit
         }
         anim.SetBool("IsMove", isMove); // vec.x가 0이 아닐 때 isMove가 true, 0이면 false...
 
-        //if (Input.GetKeyDown(KeyCode.Space))
-        //{
-        //    Hit(10 ,transform.position);
-        //    Debug.Log("플레이어 체력 : " + myStat.HP + " / " + myStat.MaxHP);
-        //}
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Hit(10, transform.position);
+            Debug.Log("플레이어 체력 : " + myStat.HP + " / " + myStat.MaxHP);
+        }
     }
 
     private void FixedUpdate()
@@ -266,7 +259,9 @@ public class Player : MonoBehaviour, AllInterface.IHit
         rollVec.x = isLeft ? -1f : 1f;
         rigid.velocity = rollVec * 8;
         yield return new WaitForSeconds(1f);
-        if (isJump) // 공중에 있으면 점프 못하도록
+        if (!isJump)
+            rigid.velocity = Vector2.zero;
+        else // 공중에 있으면 점프 못하도록
             jumpNum += 2;
         isRoll = false;
         Physics2D.IgnoreLayerCollision(3, 6, false);
@@ -345,5 +340,25 @@ public class Player : MonoBehaviour, AllInterface.IHit
             else if ((myStat.HP < myStat.MaxHP) == false)
                 UIManager.Instance.PrintWarningMsg("이미 최대체력입니다.");
         }
+    }
+
+    public void Revive()
+    {
+        if (Life > 0)
+        {
+            Life--;
+            UIManager.Instance.MinusLife(Life);
+        }
+        else
+        {
+            UIManager.Instance.PrintWarningMsg("남은 라이프가 없어 부활할 수 없습니다.");
+            return;
+        }
+
+        transform.position = Vector3.zero;
+        anim.SetTrigger("IsRevive");
+        myStat.HP = myStat.MaxHP;
+        GameManager.Instance.ExitDeadScreen();
+        Physics2D.IgnoreLayerCollision(3, 6, false);
     }
 }

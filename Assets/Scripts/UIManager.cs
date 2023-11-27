@@ -53,6 +53,17 @@ public class UIManager : Singleton<UIManager>
         LifeHeartTr.GetChild(lifeNum).gameObject.SetActive(false);
     }
 
+    public void PlusLife(int lifeNum)
+    {
+        if (player.GetLife() > lifeNum)
+            return;
+
+        for (int i = 0; i < lifeNum; i++)
+        {
+            LifeHeartTr.GetChild(i).gameObject.SetActive(false);
+        }
+    }
+
     int enforceNum => (GameManager.Instance.player.GetKillCount() - (GameManager.Instance.player.GetKillCount() % 10)) / 10;
 
     void Start()

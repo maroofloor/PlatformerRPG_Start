@@ -15,8 +15,6 @@ public class MonsterSpawner : Singleton<MonsterSpawner>
 
     void Start()
     {
-
-
         points = GameObject.Find("SpawnPoint").GetComponentsInChildren<Transform>();
 
         for (int i = 0; i < 8; i++)
@@ -43,6 +41,7 @@ public class MonsterSpawner : Singleton<MonsterSpawner>
             GameObject tmp = MonsterQueue.Dequeue();
             tmp.GetComponent<Monster>().SetInfo(points[tmp.GetComponent<Monster>().areaNum].position);
             tmp.SetActive(true);
+            tmp.GetComponent<Monster>().StartChangeMovement();
 
             //if (tmp.GetComponent<Monster>().cor == null)
             //    tmp.GetComponent<Monster>().cor = StartCoroutine(tmp.GetComponent<Monster>().Changemovement());

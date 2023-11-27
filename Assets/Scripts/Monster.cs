@@ -29,13 +29,13 @@ public class Monster : MonoBehaviour, AllInterface.IHit
     RaycastHit2D frontperception;
     RaycastHit2D backperception;
 
-    public Coroutine cor = null;
+    Coroutine cor = null;
     bool isDetect;
     Vector3 chaseDirVec = Vector3.zero;
 
     void Start()
     {
-        enemy_stat = new AllStruct.Stat(50, 10); // 몬스터 스탯 임시로 적용
+        enemy_stat = new AllStruct.Stat(100, 20); // 몬스터 스탯 임시로 적용
         HPBar.maxValue = enemy_stat.MaxHP;
         HPBar.value = enemy_stat.HP;
         rigid = GetComponent<Rigidbody2D>();
@@ -46,11 +46,17 @@ public class Monster : MonoBehaviour, AllInterface.IHit
         isHit = false;
         isDetect = false;
         attackCool = 0f;
+        //if (cor == null)
+        //    cor = StartCoroutine(Changemovement());
+    }
+
+    public void StartChangeMovement()
+    {
         if (cor == null)
             cor = StartCoroutine(Changemovement());
     }
 
-    public IEnumerator Changemovement()
+    IEnumerator Changemovement()
     {
         while (isAlive)
         {
@@ -63,6 +69,7 @@ public class Monster : MonoBehaviour, AllInterface.IHit
             isRight = Random.Range(0, 2) == 0 ? true : false;
             yield return new WaitForSeconds(Random.Range(1f, 1.5f));
         }
+
         if (isAlive == false && cor != null)
         {
             StopCoroutine(cor);
@@ -177,11 +184,6 @@ public class Monster : MonoBehaviour, AllInterface.IHit
         }
         else if (isAlive && isDetect) // 플레이어를 감지하면 플레이어를 따라다님
         {
-            if (cor != null)
-            {
-                StopCoroutine(cor);
-                cor = null;
-            }
             isRight = chaseDirVec.x > 0f;
             if (rayHit.collider != null)
             {
@@ -296,6 +298,9 @@ public class Monster : MonoBehaviour, AllInterface.IHit
 
     public void SetInfo(Vector3 pos)
     {
+        if (areaNum == 1)
+            pos.x = Random.Range(50,71);
+
         transform.position = pos;
         enemy_stat.MaxHP = GameManager.Instance.player.myStat.Att * 5; // 플레이어의 공격력으로 5번 맞으면 죽도록 생성
         enemy_stat.HP = enemy_stat.MaxHP;
@@ -307,11 +312,13 @@ public class Monster : MonoBehaviour, AllInterface.IHit
         if (col == null)
             col = GetComponent<CapsuleCollider2D>();
 
-        col.enabled = true;
-
         if (rigid == null)
             rigid = GetComponent<Rigidbody2D>();
 
+        if (anim == null)
+            anim = GetComponent<Animator>();
+
+        col.enabled = true;
         rigid.gravityScale = 1;
         transform.GetChild(0).gameObject.SetActive(true);
         isDetect = false;
@@ -327,7 +334,7 @@ public class Monster : MonoBehaviour, AllInterface.IHit
         Debug.Log("몬스터 사망");
         GameManager.Instance.player.AddKillCount();
         UIManager.Instance.killCountUpdate();
-        if (Random.Range(0, 6) == 3)
+        if (Random.Range(0, 6) == 3) // 20% 확률로 포션드랍
             GameManager.Instance.player.AddPotionNum();
         UIManager.Instance.PotionNumUpdate();
         transform.GetChild(0).gameObject.SetActive(false);

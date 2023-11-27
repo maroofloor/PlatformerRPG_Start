@@ -49,10 +49,6 @@ public class GameManager : Singleton<GameManager>
         playerHPBar.fillAmount = player.myStat.HP / player.myStat.MaxHP;
     }
 
-    public void SAVEButtonClicked()
-    {
-    }
-
     public void EnforceStat(int enforceNum)
     {
         AllEnum.EnforceType enforceType = (AllEnum.EnforceType)enforceNum;

@@ -144,9 +144,9 @@ TextureImporter:
       name: Skeleton Hit_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 6
         y: 0
-        width: 30
+        width: 22
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -165,9 +165,9 @@ TextureImporter:
       name: Skeleton Hit_1
       rect:
         serializedVersion: 2
-        x: 30
+        x: 36
         y: 0
-        width: 30
+        width: 22
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -186,9 +186,9 @@ TextureImporter:
       name: Skeleton Hit_2
       rect:
         serializedVersion: 2
-        x: 60
+        x: 62
         y: 0
-        width: 30
+        width: 23
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -209,7 +209,7 @@ TextureImporter:
         serializedVersion: 2
         x: 90
         y: 0
-        width: 30
+        width: 24
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -228,9 +228,9 @@ TextureImporter:
       name: Skeleton Hit_4
       rect:
         serializedVersion: 2
-        x: 120
+        x: 123
         y: 0
-        width: 30
+        width: 23
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -249,9 +249,9 @@ TextureImporter:
       name: Skeleton Hit_5
       rect:
         serializedVersion: 2
-        x: 150
+        x: 156
         y: 0
-        width: 30
+        width: 24
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -270,9 +270,9 @@ TextureImporter:
       name: Skeleton Hit_6
       rect:
         serializedVersion: 2
-        x: 180
+        x: 186
         y: 0
-        width: 30
+        width: 23
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -291,9 +291,9 @@ TextureImporter:
       name: Skeleton Hit_7
       rect:
         serializedVersion: 2
-        x: 210
+        x: 216
         y: 0
-        width: 30
+        width: 22
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
