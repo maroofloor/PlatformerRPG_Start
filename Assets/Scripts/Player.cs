@@ -71,7 +71,8 @@ public class Player : MonoBehaviour, AllInterface.IHit
     public void AddKillCount()
     {
         killCount++;
-    }public void RemoveKillCount()
+    }
+    public void RemoveKillCount()
     {
         killCount -= 10;
     }
@@ -195,6 +196,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
                 jumpNum = 0;
                 jumpVec = Vector3.zero;
                 rigid.velocity = Vector3.zero; // 없으면 캐릭터가 공격중 착지했을때에 미끄러짐
+                SoundManager.Instance.SetPlayerSound(8, transform.position);
             }
         }
         else if (collision.gameObject.CompareTag("Enemy"))
@@ -224,6 +226,20 @@ public class Player : MonoBehaviour, AllInterface.IHit
         }
     }
 
+    public void StepSound()
+    {
+        if (SoundManager.Instance.GetEffects(2).isPlaying)
+            return;
+        SoundManager.Instance.SetPlayerSound(5, transform.position);
+    }
+    public void RollSound()
+    {
+        if (!isJump)
+        {
+            SoundManager.Instance.SetPlayerSound(7, transform.position);
+        }
+    }
+
     IEnumerator PlayAttack()
     {
         //for (int i = 0; i < hits.Length; i++)
@@ -234,9 +250,14 @@ public class Player : MonoBehaviour, AllInterface.IHit
         for (int i = 0; i < hits.Length; i++)
         {
             if (hits[i].collider != null /*&& hits[i].transform.GetComponent<Monster>().isAlive*/)
-                hits[i].transform.GetComponent<Monster>().Hit(myStat.Att, transform.position);
+            {
+                if (hits[i].collider.transform.TryGetComponent<Boss>(out Boss boss))
+                    hits[i].transform.GetComponent<Boss>().Hit(myStat.Att, transform.position);
+                else
+                    hits[i].transform.GetComponent<Monster>().Hit(myStat.Att, transform.position);
+            }
         }
-
+        SoundManager.Instance.SetPlayerSound(10, transform.position);
         if (attackNum == 1)
         {
             anim.SetTrigger("IsAttack1");
@@ -294,26 +315,34 @@ public class Player : MonoBehaviour, AllInterface.IHit
             if (damageVal > 0f)
                 myStat.HP = Mathf.Clamp(myStat.HP - damageVal, 0, myStat.MaxHP);
 
-            #region 넉백될 벡터 구하기
-            Vector2 KnockVec = Vector2.zero;
-            KnockVec = (Vector2)transform.position - pos;
-            bool dirIsLeft = KnockVec.x < 0f;
-            KnockVec = dirIsLeft ? Vector2.left : Vector2.right;
-            KnockVec.y = 0.5f;
-            KnockVec *= 5f;
-            #endregion
-            rigid.velocity = KnockVec;
+            if (pos != Vector2.zero)
+            {
+                #region 넉백될 벡터 구하기
+                Vector2 KnockVec = Vector2.zero;
+                KnockVec = (Vector2)transform.position - pos;
+                bool dirIsLeft = KnockVec.x < 0f;
+                KnockVec = dirIsLeft ? Vector2.left : Vector2.right;
+                KnockVec.y = 0.5f;
+                KnockVec *= 5f;
+                #endregion
+                rigid.velocity = KnockVec;
+            }
 
             if (!isAlive)
             {
+                SoundManager.Instance.SetPlayerSound(6, transform.position);
                 Physics2D.IgnoreLayerCollision(3, 6);
                 anim.SetTrigger("IsDeath");
                 GameManager.Instance.PrintDeadScreen();
             }
             else
             {
-                anim.SetTrigger("IsHit");
-                StartCoroutine(HitWait());
+                SoundManager.Instance.SetPlayerSound(4, transform.position);
+                if (pos != Vector2.zero)
+                {
+                    anim.SetTrigger("IsHit");
+                    StartCoroutine(HitWait());
+                }
             }
         }
     }
@@ -335,6 +364,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
         if (potionNum > 0 && isAlive && myStat.HP < myStat.MaxHP)
         {
             potionNum--;
+            SoundManager.Instance.SetPlayerSound(9, transform.position);
             myStat.HP = Mathf.Clamp(myStat.HP + (int)(myStat.MaxHP * 0.3f), 0, myStat.MaxHP);
             UIManager.Instance.PotionNumUpdate();
         }

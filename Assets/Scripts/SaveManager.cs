@@ -39,7 +39,7 @@ public class SaveManager : Singleton<SaveManager>
 
             UIManager.Instance.PotionNumUpdate();
             UIManager.Instance.killCountUpdate();
-            UIManager.Instance.PlusLife(PlayerPrefs.GetInt("Life"));
+            UIManager.Instance.SetLife(PlayerPrefs.GetInt("Life"));
 
             player.transform.position = Vector3.zero;
             UIManager.Instance.UI_MenuBotton();

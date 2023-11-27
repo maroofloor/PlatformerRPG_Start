@@ -35,7 +35,7 @@ public class Monster : MonoBehaviour, AllInterface.IHit
 
     void Start()
     {
-        enemy_stat = new AllStruct.Stat(100, 20); // 몬스터 스탯 임시로 적용
+        enemy_stat = new AllStruct.Stat(50, 10); // 몬스터 스탯 임시로 적용
         HPBar.maxValue = enemy_stat.MaxHP;
         HPBar.value = enemy_stat.HP;
         rigid = GetComponent<Rigidbody2D>();
@@ -210,6 +210,7 @@ public class Monster : MonoBehaviour, AllInterface.IHit
 
     public void Attack()
     {
+        SoundManager.Instance.SetSoundEffect(3, transform.position);
         if (frontperception.collider != null && GameManager.Instance.player.GetIsRoll() == false && GameManager.Instance.player.GetIsHit() == false)
             frontperception.collider.transform.GetComponent<Player>().Hit(enemy_stat.Att, transform.position);
     }
@@ -348,13 +349,17 @@ public class Monster : MonoBehaviour, AllInterface.IHit
         HPBar.value = enemy_stat.HP;
 
         if (isAlive == false)
+        {
             Die();
+            SoundManager.Instance.SetSoundEffect(2, transform.position);
+        }
         else
         {
             StartCoroutine(WaitHit());
             if (isAttack == false)
                 anim.SetTrigger("Hit");
             isDetect = true;
+            SoundManager.Instance.SetSoundEffect(Random.Range(0,2), transform.position);
             //#region 넉백될 벡터 구하기
             //Vector2 KnockVec = Vector2.zero;
             //KnockVec = (Vector2)transform.position - pos;

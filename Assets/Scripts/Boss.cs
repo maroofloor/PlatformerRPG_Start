@@ -10,7 +10,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
     public Transform Target;
     Rigidbody2D rigid;
     public AllStruct.Stat Boss_stat;
-    public CapsuleCollider2D col;
+    public BoxCollider2D col;
     public float attspeed;
 
     [SerializeField]
@@ -67,9 +67,15 @@ public class Boss : MonoBehaviour, AllInterface.IHit
                     Attack();
                 }
                 else
-                    Move();
+                {
+                    if (dis > 3f)
+                    {
+                        Move();
+                    }
+                }
+                    
 
-                Hit(1000, Vector2.zero);
+                //Hit(1000, Vector2.zero);
             }
             else
             {
@@ -111,31 +117,24 @@ public class Boss : MonoBehaviour, AllInterface.IHit
         attackCool = 5f;
         if (attackCor == null)
             attackCor = StartCoroutine(AttackCoolDown());
-        if (Boss_stat.HP <= (Boss_stat.MaxHP) * 0.3f)
-        {
-            movepower = 3f;
-        }
     }
 
     public void AttackEvent()
     {
-        if (hit.collider != null)
+        SoundManager.Instance.SetSoundEffect(11, transform.position);
+
+        hitVec.x = transform.position.x;
+        hitVec.y = transform.position.y + 0.5f;
+        hit = Physics2D.Raycast(hitVec, isLeft ? Vector2.left : Vector2.right, 5.5f, 1 << LayerMask.NameToLayer("Player"));
+        if (hit.collider != null && GameManager.Instance.player.GetIsRoll() == false)
             hit.collider.transform.GetComponent<Player>().Hit(Boss_stat.Att, transform.position);
     }
 
     IEnumerator WaitAttack()
     {
         isattack = true;
-        yield return new WaitForSeconds(1.3f);
+        yield return new WaitForSeconds(3.5f);
         isattack = false;
-
-        hitVec.x = transform.position.x;
-        hitVec.y = transform.position.y + 0.5f;
-        hit = Physics2D.Raycast(hitVec, isLeft ? Vector2.left : Vector2.right, 5.5f, 1 << LayerMask.NameToLayer("Player"));
-        if (hit.collider != null)
-        {
-            hit.collider.transform.GetComponent<Player>().Hit(Boss_stat.Att, transform.position);
-        }
     }
 
     IEnumerator AttackCoolDown()
@@ -174,18 +173,37 @@ public class Boss : MonoBehaviour, AllInterface.IHit
 
     public void Hit(float damage, Vector2 pos)
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            Boss_stat.HP -= damage; // 플레이어의 공격력만큼 데미지 입음
-            anim.SetTrigger("Boss_HIt");
-            HPBar.value = Boss_stat.HP;
-            Debug.Log("보스몬스터 체력 : " + Boss_stat.HP + " / " + Boss_stat.MaxHP);
-        }
-        if (Boss_stat.HP <= 0)
+        if (isAlive == false)
         {
             Debug.Log("죽음");
             Die();
         }
+        else
+        {
+            Boss_stat.HP -= damage; // 플레이어의 공격력만큼 데미지 입음
+            SoundManager.Instance.SetSoundEffect(Random.Range(12,15), transform.position);
+            if (Boss_stat.HP <= (Boss_stat.MaxHP) * 0.3f)
+                movepower = 3f;
+            if (attackCool <= 3.5f)
+                anim.SetTrigger("Boss_HIt");
+            HPBar.value = Boss_stat.HP;
+            Debug.Log("보스몬스터 체력 : " + Boss_stat.HP + " / " + Boss_stat.MaxHP);
+        }
+
+        //if (Input.GetKeyDown(KeyCode.A))
+        //{
+        //    Boss_stat.HP -= damage; // 플레이어의 공격력만큼 데미지 입음
+        //    if (Boss_stat.HP <= (Boss_stat.MaxHP) * 0.3f)
+        //        movepower = 3f;
+        //    anim.SetTrigger("Boss_HIt");
+        //    HPBar.value = Boss_stat.HP;
+        //    Debug.Log("보스몬스터 체력 : " + Boss_stat.HP + " / " + Boss_stat.MaxHP);
+        //}
+        //if (Boss_stat.HP <= 0)
+        //{
+        //    Debug.Log("죽음");
+        //    Die();
+        //}
     }
 
     void Die()
