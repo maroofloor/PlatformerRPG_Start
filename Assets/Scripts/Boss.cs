@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static AllStruct;
 
 public class Boss : MonoBehaviour, AllInterface.IHit
 {
@@ -12,7 +13,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
     public AllStruct.Stat Boss_stat;
     public BoxCollider2D col;
     public float attspeed;
-
+    SpriteRenderer sprite;
     [SerializeField]
     Slider HPBar;
     float dir;
@@ -38,7 +39,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
 
     void Start()
     {
-        Boss_stat = new AllStruct.Stat(10000, 1/*300*/, 100);
+        Boss_stat = new AllStruct.Stat(10000, 300, 100);
         HPBar.maxValue = Boss_stat.MaxHP;
         HPBar.value = Boss_stat.HP;
         rigid = GetComponent<Rigidbody2D>();
@@ -109,6 +110,8 @@ public class Boss : MonoBehaviour, AllInterface.IHit
             isdetected = false;
             transform.localPosition = new Vector2(18, 0);
             Boss_stat.HP = Boss_stat.MaxHP;
+            Boss_stat.Att = 300;
+            Boss_stat.Def = 100;
         }
     }
 
@@ -261,6 +264,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
 
     public void Hit(float damage, Vector2 pos)
     {
+        float damageVal = damage - Boss_stat.Def;
         if (isAlive == false)
         {
             Debug.Log("죽음");
@@ -268,10 +272,15 @@ public class Boss : MonoBehaviour, AllInterface.IHit
         }
         else
         {
-            Boss_stat.HP -= damage; // 플레이어의 공격력만큼 데미지 입음
+            Boss_stat.HP -= damageVal; // 플레이어의 공격력만큼 데미지 입음
             SoundManager.Instance.SetSoundEffect(Random.Range(12,15), transform.position);
             if (Boss_stat.HP <= (Boss_stat.MaxHP) * 0.3f)
+            { 
                 movepower = 3f;
+                Boss_stat.Att = 1000;
+                Boss_stat.Def = 300;                
+            }
+                
             if (attackCool <= 3.5f)
                 anim.SetTrigger("Boss_HIt");
             HPBar.value = Boss_stat.HP;
