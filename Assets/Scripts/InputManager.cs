@@ -20,6 +20,8 @@ public class InputManager : MonoBehaviour
     public static bool IsAndroid;
     [SerializeField]
     Player player;
+    [SerializeField]
+    Transform MobileControllerTr;
     public Vector3 dir = Vector3.zero;
     public Vector3 joyDir = Vector3.zero;
 
@@ -38,6 +40,8 @@ public class InputManager : MonoBehaviour
 
         if (!IsAndroid)
         {
+            MobileControllerTr.gameObject.SetActive(false);
+
             if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
                 player.vec.x = Input.GetAxisRaw("Horizontal");
 
@@ -61,6 +65,10 @@ public class InputManager : MonoBehaviour
                     return;
                 }
                 UIManager.Instance.UI_MenuBotton();
+            }
+            else
+            {
+                MobileControllerTr.gameObject.SetActive(true);
             }
         }
     }

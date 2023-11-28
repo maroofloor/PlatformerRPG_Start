@@ -11,7 +11,11 @@ public class Player : MonoBehaviour, AllInterface.IHit
     }
     Rigidbody2D rigid;
 
-    public float rollCool;
+    float rollCool;
+    public float GetRollCool()
+    {
+        return rollCool;
+    }
     Coroutine rollCor = null;
 
     public Vector3 vec = Vector3.zero;
@@ -98,6 +102,10 @@ public class Player : MonoBehaviour, AllInterface.IHit
     [SerializeField]
     PlayerSkillScripts playerSkill;
     float skillCool;
+    public float GetSkillCool()
+    {
+        return skillCool;
+    }
     Coroutine skillCor = null;
 
     void Start()
@@ -174,6 +182,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
     {
         if (skillCool <= 0f && skillCor == null)
         {
+            skillCool = 10f;
             StartCoroutine(PlaySkill());
             skillCor = StartCoroutine(SkillCoolDown());
         }
@@ -181,6 +190,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
 
     IEnumerator SkillCoolDown()
     {
+        GameManager.Instance.SkillCoolImg.gameObject.SetActive(true);
         while (skillCool > 0f)
         {
             skillCool -= 0.1f;
@@ -189,6 +199,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
 
         if (skillCool <= 0f && skillCor != null)
         {
+            GameManager.Instance.SkillCoolImg.gameObject.SetActive(false);
             StopCoroutine(skillCor);
             skillCor = null;
         }
@@ -251,7 +262,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
         else if (collision.gameObject.CompareTag("Enemy"))
         {
             if (collision.transform.TryGetComponent<Boss>(out Boss boss))
-                Hit(collision.transform.GetComponent<Boss>().Boss_stat.Att, collision.transform.position);
+                Hit(boss.Boss_stat.Att, collision.transform.position);
             else
                 Hit(collision.transform.GetComponent<Monster>().enemy_stat.Att, collision.transform.position);
         }
@@ -301,7 +312,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
             if (hits[i].collider != null /*&& hits[i].transform.GetComponent<Monster>().isAlive*/)
             {
                 if (hits[i].collider.transform.TryGetComponent<Boss>(out Boss boss))
-                    hits[i].transform.GetComponent<Boss>().Hit(myStat.Att, transform.position);
+                    boss.Hit(myStat.Att, transform.position);
                 else
                     hits[i].transform.GetComponent<Monster>().Hit(myStat.Att, transform.position);
             }
@@ -347,13 +358,19 @@ public class Player : MonoBehaviour, AllInterface.IHit
 
     IEnumerator CoolRoll()
     {
+        GameManager.Instance.RollCoolImg.gameObject.SetActive(true);
         while (rollCool > 0)
         {
             yield return new WaitForSeconds(0.1f);
             rollCool -= 0.1f;
         }
-        StopCoroutine(rollCor);
-        rollCor = null;
+
+        if (rollCor != null)
+        {
+            GameManager.Instance.RollCoolImg.gameObject.SetActive(false);
+            StopCoroutine(rollCor);
+            rollCor = null;
+        }
     }
 
     public void Hit(float damage, Vector2 pos)

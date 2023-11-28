@@ -9,13 +9,14 @@ public class SoundManager : Singleton<SoundManager>
     AudioClip[] allSoundSource_BGM;
     [SerializeField]
     AudioClip[] allSoundSource_Effect; 
-    // 0.해골_Hit_00, 1.해골_Hit_01, 2. 해골_Die_00, 3.해골_Swing_00, 4.플레이어_Hit, 5.플레이어_Run, 6.플레이어_Die, 7.플레이어_Roll, 8.플레이어_Landing
-    // 9.플레이어_Heal, 10.플레이어_Swing, 11.보스_Attack
+    // 0.해골_Hit_, 1.해골_Hit_01, 2. 해골_Die, 3.해골_Swing, 4.플레이어_Hit, 5.플레이어_Run, 6.플레이어_Die, 7.플레이어_Roll, 8.플레이어_Landing
+    // 9.플레이어_Heal, 10.플레이어_Swing, 11.보스_Attack, 12~14. 보스_Hit, 15.보스_Skill, 16.플레이어_Skill, 17.보스_Die, 18.보스_Walk
 
     [SerializeField]
     AudioSource BGM;
     [SerializeField]
     AudioSource[] Effects;
+
     public AudioSource GetEffects(int effectNum)
     {
         return Effects[effectNum];
@@ -44,9 +45,12 @@ public class SoundManager : Singleton<SoundManager>
 
     public void SetSoundBGM(int songNum)
     {
+        if (BGM.isPlaying)
+            BGM.Stop();
         BGM.clip = allSoundSource_BGM[songNum];
         BGM.Play();
     }
+
     public void VolumeBGM()
     {
         BGM.volume = sliderBGM.value;

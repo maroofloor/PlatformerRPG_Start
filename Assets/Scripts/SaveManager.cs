@@ -48,7 +48,7 @@ public class SaveManager : Singleton<SaveManager>
     
     public void SaveVolumeInfo(float vol, bool isBGM) // BGM¿Ã∏È true, SFX∏È false
     {
-        if (isBGM == false)
+        if (isBGM)
             PlayerPrefs.SetFloat("volBGM", vol);
         else
             PlayerPrefs.SetFloat("volSFX", vol);

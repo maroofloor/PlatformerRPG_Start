@@ -8442,6 +8442,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9215982575984161635}
     m_Modifications:
+    - target: {fileID: 1576444540521929730, guid: 1760d8af8a751994a8e1d894a3d21245, type: 3}
+      propertyPath: m_SortingOrder
+      value: -2
+      objectReference: {fileID: 0}
     - target: {fileID: 1576444540521929731, guid: 1760d8af8a751994a8e1d894a3d21245, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -8494,6 +8498,10 @@ PrefabInstance:
       propertyPath: Target
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 1576444540521929740, guid: 1760d8af8a751994a8e1d894a3d21245, type: 3}
+      propertyPath: SkillPrefab
+      value: 
+      objectReference: {fileID: 8859699807452201150, guid: 395f0fd39043c0f428fb0eeb9b6f2c6c, type: 3}
     - target: {fileID: 1576444541317878017, guid: 1760d8af8a751994a8e1d894a3d21245, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0

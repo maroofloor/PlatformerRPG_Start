@@ -12,17 +12,19 @@ public class GameManager : Singleton<GameManager>
     Transform mainCanvasTr;
     [SerializeField]
     Image playerHPBar;
-    [SerializeField]
-    Image RollCoolImg;
+    public Image RollCoolImg;
+    public Image SkillCoolImg;
     float rollMaxCool = 3f;
-    public InputManager inputManager;
+    float skillMaxColl = 10f;
     
     [SerializeField]
     Transform gameOverTr;
     Text deadTxt;
+    Text clearTxt;
     Button reviveBut;
     Color overBackColor = Color.black;
     Color deadTxtColor = new Color(0.6f, 0f, 0f, 1f);
+    Color clearTxtColor = new Color(0f, 0.6f, 0f, 1f);
     Coroutine fadeCor = null;
 
     float[] enforceAtt = new float[11] { 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 600 };
@@ -33,17 +35,21 @@ public class GameManager : Singleton<GameManager>
     {
         player.gameObject.SetActive(true);
         deadTxt = gameOverTr.GetChild(0).GetComponent<Text>();
-        reviveBut = gameOverTr.GetChild(1).GetComponent<Button>();
+        clearTxt = gameOverTr.GetChild(1).GetComponent<Text>();
+        reviveBut = gameOverTr.GetChild(2).GetComponent<Button>();
         overBackColor.a = 0f;
         gameOverTr.GetComponent<Image>().color = overBackColor;
         deadTxtColor.a = 0f;
         deadTxt.color = deadTxtColor;
+        clearTxtColor.a = 0f;
+        clearTxt.color = clearTxtColor;
         reviveBut.gameObject.SetActive(false);
         gameOverTr.gameObject.SetActive(false);
     }
     void Update()
     {
-        RollCoolImg.fillAmount = player.rollCool / rollMaxCool;
+        RollCoolImg.fillAmount = player.GetRollCool() / rollMaxCool;
+        SkillCoolImg.fillAmount = player.GetSkillCool() / skillMaxColl;
     }
     void FixedUpdate()
     {
@@ -133,6 +139,11 @@ public class GameManager : Singleton<GameManager>
         if (fadeCor == null)
             fadeCor = StartCoroutine(FadeInDeadScreen());
     }
+    public void PrintClearScreen()
+    {
+        if (fadeCor == null)
+            fadeCor = StartCoroutine(FadeInVitoryScreen());
+    }
 
     public void ExitDeadScreen()
     {
@@ -167,6 +178,33 @@ public class GameManager : Singleton<GameManager>
         {
             yield return new WaitForSeconds(1f);
             reviveBut.gameObject.SetActive(true);
+        }
+
+        if (fadeCor != null)
+        {
+            StopCoroutine(fadeCor);
+            fadeCor = null;
+        }
+    }
+
+    IEnumerator FadeInVitoryScreen()
+    {
+        yield return new WaitForSeconds(2f);
+        gameOverTr.gameObject.SetActive(true);
+        while (overBackColor.a < 1f)
+        {
+            overBackColor.a = Mathf.Clamp(overBackColor.a + Time.fixedDeltaTime, 0, 1);
+            gameOverTr.GetComponent<Image>().color = overBackColor;
+            yield return new WaitForFixedUpdate();
+        }
+        if (overBackColor.a == 1f)
+        {
+            while (clearTxtColor.a < 1f)
+            {
+                clearTxtColor.a = Mathf.Clamp(clearTxtColor.a + Time.fixedDeltaTime, 0, 1);
+                clearTxt.color = clearTxtColor;
+                yield return new WaitForFixedUpdate();
+            }
         }
 
         if (fadeCor != null)

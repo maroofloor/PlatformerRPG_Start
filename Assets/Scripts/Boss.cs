@@ -99,6 +99,8 @@ public class Boss : MonoBehaviour, AllInterface.IHit
                 anim.SetBool("Boss_Walk", ismove);
             }
 
+            if (Input.GetKeyDown(KeyCode.A))
+                Hit(10000, transform.position);
         }
     }
 
@@ -138,7 +140,8 @@ public class Boss : MonoBehaviour, AllInterface.IHit
 
    void UseSkill()
     {
-        Debug.Log("UseSkill 불림");
+        //Debug.Log("UseSkill 불림");
+        Move();
         Attack();
         if (skillCool <= 0f && skillCor == null)
         {
@@ -171,7 +174,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
 
     IEnumerator SkillCoolDown()
     {
-        Debug.Log("SkillCoolDown 불림");
+        //Debug.Log("SkillCoolDown 불림");
         while (skillCool > 0f)
         {
             skillCool -= 0.1f;
@@ -187,7 +190,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
 
     IEnumerator PlaySkill()
     {
-        Debug.Log("PlaySkill 불림");
+        //Debug.Log("PlaySkill 불림");
         Vector2 startVec; //new Vector2(transform.position.x + (5.5f * (isLeft ? -1f : 1f)), transform.position.y - 0.4f);
         startVec.x = transform.position.x + (5.5f * (isLeft ? -1f : 1f));
         startVec.y = transform.position.y - 0.4f;
@@ -296,9 +299,17 @@ public class Boss : MonoBehaviour, AllInterface.IHit
 
     void Die()
     {
+        SoundManager.Instance.SetSoundEffect(17, transform.position);
         anim.SetTrigger("Boss_Death");
         ismove = false;
         rigid.gravityScale = 0;
+        GetComponent<BoxCollider2D>().enabled = false;
+        GameManager.Instance.PrintClearScreen();
+    }
+
+    public void WalkSound()
+    {
+        SoundManager.Instance.SetSoundEffect(18, transform.position);
     }
 }
 
