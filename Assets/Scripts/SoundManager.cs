@@ -23,10 +23,18 @@ public class SoundManager : Singleton<SoundManager>
 
     [SerializeField]
     Slider sliderBGM;
+    [SerializeField]
+    Slider sliderSFX;
 
-    void Start()
+    private void Start()
     {
-        
+        BGM.volume = SaveManager.Instance.LoadVolumeInfo(true);
+        for (int i = 0; i < Effects.Length; i++)
+        {
+            Effects[i].volume = SaveManager.Instance.LoadVolumeInfo(false);
+        }
+        sliderBGM.value = BGM.volume;
+        sliderSFX.value = Effects[0].volume;
     }
 
     void Update()
@@ -42,6 +50,7 @@ public class SoundManager : Singleton<SoundManager>
     public void VolumeBGM()
     {
         BGM.volume = sliderBGM.value;
+        SaveManager.Instance.SaveVolumeInfo(BGM.volume, true);
     }
 
     public void SetPlayerSound(/*bool action, */int soundNum, Vector2 pos)
@@ -62,5 +71,14 @@ public class SoundManager : Singleton<SoundManager>
             Effects[0].transform.position = pos;
             Effects[0].PlayOneShot(allSoundSource_Effect[soundNum]);
         }
+    }
+
+    public void VolumeSFX()
+    {
+        for (int i = 0; i < Effects.Length; i++)
+        {
+            Effects[i].volume = sliderSFX.value;
+        }
+        SaveManager.Instance.SaveVolumeInfo(Effects[0].volume, false);
     }
 }

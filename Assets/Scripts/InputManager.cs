@@ -41,6 +41,8 @@ public class InputManager : MonoBehaviour
             if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
                 player.vec.x = Input.GetAxisRaw("Horizontal");
 
+            if (Input.GetKeyDown(KeyCode.S))
+                GameManager.Instance.player.Skill();
             if (Input.GetKeyDown(KeyCode.C))
                 player.Jump();
             if (Input.GetKeyDown(KeyCode.Z))

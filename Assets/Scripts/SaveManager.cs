@@ -45,4 +45,20 @@ public class SaveManager : Singleton<SaveManager>
             UIManager.Instance.UI_MenuBotton();
         }
     }
+    
+    public void SaveVolumeInfo(float vol, bool isBGM) // BGM¿Ã∏È true, SFX∏È false
+    {
+        if (isBGM == false)
+            PlayerPrefs.SetFloat("volBGM", vol);
+        else
+            PlayerPrefs.SetFloat("volSFX", vol);
+    }
+
+    public float LoadVolumeInfo(bool isBGM)
+    {
+        if (isBGM)
+            return PlayerPrefs.GetFloat("volBGM");
+        else
+            return PlayerPrefs.GetFloat("volSFX");
+    }
 }

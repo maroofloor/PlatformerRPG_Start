@@ -5,8 +5,9 @@ using UnityEngine.UI;
 
 public class GameManager : Singleton<GameManager>
 {
-    [SerializeField]
+    public Boss boss;
     public Player player;
+
     [SerializeField]
     Transform mainCanvasTr;
     [SerializeField]
@@ -25,7 +26,7 @@ public class GameManager : Singleton<GameManager>
     Coroutine fadeCor = null;
 
     float[] enforceAtt = new float[11] { 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 600 };
-    float[] enforceDef = new float[11] { 0, 2, 6, 12, 20, 30, 42, 56, 72, 90, 550 };
+    float[] enforceDef = new float[11] { 0, 2, 6, 12, 20, 30, 42, 56, 72, 90, 110 };
     float[] enforceHP = new float[11] { 100, 200, 330, 490, 680, 900, 1150, 1440, 1770, 2140, 3000 };
 
     private void Start()

@@ -28,7 +28,7 @@ public class HeatArea : MonoBehaviour
             {
                 collision.GetComponent<Player>().Hit(10, Vector2.zero);
                 //collision.GetComponent<Animator>().SetTrigger("Heat");
-                DamageCool = 3f;
+                DamageCool = 5f;
                 cor = StartCoroutine(DamageCoolDown());
             }
         }

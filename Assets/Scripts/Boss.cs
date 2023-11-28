@@ -25,9 +25,16 @@ public class Boss : MonoBehaviour, AllInterface.IHit
     float attackCool = 0;
     Coroutine attackCor = null;
 
+    float skillCool = 0;
+    Coroutine skillCor = null;
+
     Vector2 hitVec = Vector2.zero;
 
     RaycastHit2D hit;
+
+    [SerializeField]
+    GameObject SkillPrefab;
+    Queue<GameObject> skills = new Queue<GameObject>();
 
     void Start()
     {
@@ -39,6 +46,12 @@ public class Boss : MonoBehaviour, AllInterface.IHit
         ismove = false;
         isLeft = true;
         isdetected = false;
+        for (int i = 0; i < 5; i++)
+        {
+            GameObject tmp = Instantiate(SkillPrefab, this.transform.parent);
+            skills.Enqueue(tmp);
+            tmp.gameObject.SetActive(false);
+        }
     }
 
     void Update()
@@ -46,7 +59,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
         if (isAlive)
         {
             //ismove = false;
-            anim.SetBool("Boss_Walk", ismove);
+            //anim.SetBool("Boss_Walk", ismove);
             float dis = Vector3.Distance(transform.position, Target.position);
             if (dis <= 10 /*&& dis > 5*/)
                 isdetected = true;
@@ -62,19 +75,22 @@ public class Boss : MonoBehaviour, AllInterface.IHit
                 Debug.DrawRay(hitVec, (isLeft ? Vector2.left : Vector2.right) * 5.5f, Color.magenta);
                 hit = Physics2D.Raycast(hitVec, isLeft ? Vector2.left : Vector2.right, 5.5f, 1 << LayerMask.NameToLayer("Player"));
 
-                if (hit.collider != null && attackCool <= 0)
-                {
+                if (skillCool <= 0f)
+                    UseSkill();
+                else if (hit.collider != null && attackCool <= 0f)
                     Attack();
-                }
                 else
                 {
                     if (dis > 3f)
                     {
                         Move();
                     }
+                    else
+                    {
+                        ismove = false;
+                        anim.SetBool("Boss_Walk", ismove);
+                    }
                 }
-                    
-
                 //Hit(1000, Vector2.zero);
             }
             else
@@ -83,6 +99,16 @@ public class Boss : MonoBehaviour, AllInterface.IHit
                 anim.SetBool("Boss_Walk", ismove);
             }
 
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (GameManager.Instance.player.isAlive == false)
+        {
+            isdetected = false;
+            transform.localPosition = new Vector2(18, 0);
+            Boss_stat.HP = Boss_stat.MaxHP;
         }
     }
 
@@ -110,6 +136,19 @@ public class Boss : MonoBehaviour, AllInterface.IHit
 
     }
 
+   void UseSkill()
+    {
+        Debug.Log("UseSkill 불림");
+        Attack();
+        if (skillCool <= 0f && skillCor == null)
+        {
+            StartCoroutine(PlaySkill());
+            skillCool = 10f;
+            if (skillCor == null)
+                skillCor = StartCoroutine(SkillCoolDown());
+        }
+    }
+
     void Attack()
     {
         StartCoroutine(WaitAttack());
@@ -128,6 +167,55 @@ public class Boss : MonoBehaviour, AllInterface.IHit
         hit = Physics2D.Raycast(hitVec, isLeft ? Vector2.left : Vector2.right, 5.5f, 1 << LayerMask.NameToLayer("Player"));
         if (hit.collider != null && GameManager.Instance.player.GetIsRoll() == false)
             hit.collider.transform.GetComponent<Player>().Hit(Boss_stat.Att, transform.position);
+    }
+
+    IEnumerator SkillCoolDown()
+    {
+        Debug.Log("SkillCoolDown 불림");
+        while (skillCool > 0f)
+        {
+            skillCool -= 0.1f;
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        if (skillCool <= 0f && skillCor != null)
+        {
+            StopCoroutine(skillCor);
+            skillCor = null;
+        }
+    }
+
+    IEnumerator PlaySkill()
+    {
+        Debug.Log("PlaySkill 불림");
+        Vector2 startVec; //new Vector2(transform.position.x + (5.5f * (isLeft ? -1f : 1f)), transform.position.y - 0.4f);
+        startVec.x = transform.position.x + (5.5f * (isLeft ? -1f : 1f));
+        startVec.y = transform.position.y - 0.4f;
+
+        for (int i = 0; i < 5; i++)
+        {
+            yield return new WaitForSeconds(0.8f);
+            GameObject tmp = skills.Dequeue();
+            if (i == 0)
+                tmp.transform.position = startVec;
+            else
+                startVec.x += isLeft ? -3f : 3f;
+
+            if (startVec.x > 121.5f)
+                startVec.x = 121.5f;
+            else if (startVec.x < 86.5f)
+                startVec.x = 86.5f;
+
+            tmp.transform.position = startVec;
+            tmp.SetActive(true);
+            tmp.GetComponent<BossSkillScripts>().SetInfo();
+        }
+    }
+
+    public void SkillsEnqueue(GameObject skill)
+    {
+        skills.Enqueue(skill);
+        skill.gameObject.SetActive(false);
     }
 
     IEnumerator WaitAttack()

@@ -5,6 +5,10 @@ using UnityEngine;
 public class Player : MonoBehaviour, AllInterface.IHit
 {
     Animator anim;
+    public Animator GetAnimator()
+    {
+        return anim;
+    }
     Rigidbody2D rigid;
 
     public float rollCool;
@@ -42,6 +46,10 @@ public class Player : MonoBehaviour, AllInterface.IHit
 
     bool isMove => vec.x != 0f; // vec.x가 0이 아니라면 플레이어가 이동키를 입력중...
     bool isLeft;
+    public bool GetIsLeft()
+    {
+        return isLeft;
+    }
     bool isJump; // 체공중일 때 true
     bool isAttack1; // 공격 1번 모션중일 때 true
     bool isAttack2; // 공격 2번 모션중일 때 true
@@ -87,6 +95,11 @@ public class Player : MonoBehaviour, AllInterface.IHit
     RaycastHit2D[] hits;
     LayerMask enemyLayer;
 
+    [SerializeField]
+    PlayerSkillScripts playerSkill;
+    float skillCool;
+    Coroutine skillCor = null;
+
     void Start()
     {
         potionNum = 0;
@@ -107,6 +120,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
         rayVec = Vector2.zero;
         killCount = 0;
         Life = 3;
+        skillCool = 0f;
     }
 
     public void Jump()
@@ -156,6 +170,41 @@ public class Player : MonoBehaviour, AllInterface.IHit
         if (!isAttack1 && !isAttack2 && !isRoll && !isJump && isAlive && rollCool <= 0f && !isHit)
             StartCoroutine(PlayRoll());
     }
+    public void Skill()
+    {
+        if (skillCool <= 0f && skillCor == null)
+        {
+            StartCoroutine(PlaySkill());
+            skillCor = StartCoroutine(SkillCoolDown());
+        }
+    }
+
+    IEnumerator SkillCoolDown()
+    {
+        while (skillCool > 0f)
+        {
+            skillCool -= 0.1f;
+        yield return new WaitForSeconds(0.1f);
+        }
+
+        if (skillCool <= 0f && skillCor != null)
+        {
+            StopCoroutine(skillCor);
+            skillCor = null;
+        }
+    }
+
+    IEnumerator PlaySkill()
+    {
+        playerSkill.gameObject.SetActive(true);
+        playerSkill.SetInfo();
+
+        anim.SetTrigger("IsSkill");
+        isAttack1 = true;
+        yield return new WaitForSeconds(0.4f);
+        isAttack1 = false;
+    }
+
 
     void Update()
     {
@@ -179,13 +228,13 @@ public class Player : MonoBehaviour, AllInterface.IHit
         }
     }
 
-    private void FixedUpdate()
+    void FixedUpdate()
     {
         if (isAlive && !isAttack1 && !isAttack2 && !isRoll && !isJump && !isHit) // 공격중, 회피중에 이동 할 수 없음
             transform.Translate(vec.normalized * Time.fixedDeltaTime * speed); // 캐릭터의 이동
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground") && isAlive) // 땅에 착지할 때...
         {
@@ -207,7 +256,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
                 Hit(collision.transform.GetComponent<Monster>().enemy_stat.Att, collision.transform.position);
         }
     }
-    private void OnCollisionStay2D(Collision2D collision)
+    void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground") && isAlive) // 땅에 접촉중일 때...
         {
@@ -215,7 +264,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
             anim.SetBool("IsJump", isJump);
         }
     }
-    private void OnCollisionExit2D(Collision2D collision)
+    void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground") && isAlive && !isHit) // 땅에서 접촉이 떨어졌을 때...
         {
@@ -283,7 +332,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
         isRoll = true;
         Physics2D.IgnoreLayerCollision(3, 6);
         rollVec.x = isLeft ? -1f : 1f;
-        rigid.velocity = rollVec * 8;
+        rigid.velocity = rollVec * 9;
         yield return new WaitForSeconds(1f);
         if (!isJump)
             rigid.velocity = Vector2.zero;
