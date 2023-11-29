@@ -17,10 +17,12 @@ public class Boss : MonoBehaviour, AllInterface.IHit
     Slider HPBar;
     float dir;
     bool isAlive => Boss_stat.HP > 0;
+    bool isPhase2 => Boss_stat.HP <= Boss_stat.MaxHP * 0.3f;
     bool ismove;
     bool isattack;
     bool isdetected;
     bool isLeft;
+    bool isNextPhase;
 
     float attackCool = 0;
     Coroutine attackCor = null;
@@ -38,7 +40,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
 
     void Start()
     {
-        Boss_stat = new AllStruct.Stat(10000, 1/*300*/, 100);
+        Boss_stat = new AllStruct.Stat(15000, 300, 100);
         HPBar.maxValue = Boss_stat.MaxHP;
         HPBar.value = Boss_stat.HP;
         rigid = GetComponent<Rigidbody2D>();
@@ -52,6 +54,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
             skills.Enqueue(tmp);
             tmp.gameObject.SetActive(false);
         }
+        isNextPhase = false;
     }
 
     void Update()
@@ -68,7 +71,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
             //    Attack();
             //}
 
-            if (isdetected && isattack == false)
+            if (isdetected && isattack == false && isNextPhase == false)
             {
                 hitVec.x = transform.position.x;
                 hitVec.y = transform.position.y + 0.5f;
@@ -81,7 +84,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
                     Attack();
                 else
                 {
-                    if (dis > 3f)
+                    if (dis > 3f )
                     {
                         Move();
                     }
@@ -111,6 +114,10 @@ public class Boss : MonoBehaviour, AllInterface.IHit
             isdetected = false;
             transform.localPosition = new Vector2(18, 0);
             Boss_stat.HP = Boss_stat.MaxHP;
+            HPBar.value = Boss_stat.HP;
+            Boss_stat.Att = 300;
+            Boss_stat.Def = 100;
+            count = 0;
         }
     }
 
@@ -146,7 +153,10 @@ public class Boss : MonoBehaviour, AllInterface.IHit
         if (skillCool <= 0f && skillCor == null)
         {
             StartCoroutine(PlaySkill());
-            skillCool = 10f;
+            if (isPhase2)
+                skillCool = 5f;
+            else
+                skillCool = 10f;
             if (skillCor == null)
                 skillCor = StartCoroutine(SkillCoolDown());
         }
@@ -224,7 +234,10 @@ public class Boss : MonoBehaviour, AllInterface.IHit
     IEnumerator WaitAttack()
     {
         isattack = true;
-        yield return new WaitForSeconds(3.5f);
+        if (isPhase2)
+            yield return new WaitForSeconds(2f);
+        else
+            yield return new WaitForSeconds(3.5f);
         isattack = false;
     }
 
@@ -261,9 +274,12 @@ public class Boss : MonoBehaviour, AllInterface.IHit
     //        }
     //    }
     //}
-
+    int count = 0;
     public void Hit(float damage, Vector2 pos)
     {
+        if (isNextPhase)
+            return;
+
         if (isAlive == false)
         {
             Debug.Log("죽음");
@@ -271,11 +287,25 @@ public class Boss : MonoBehaviour, AllInterface.IHit
         }
         else
         {
-            Boss_stat.HP -= damage; // 플레이어의 공격력만큼 데미지 입음
+            float damageValue;
+            damageValue = Mathf.Clamp(damage - Boss_stat.Def, 0, Mathf.Infinity);
+            Boss_stat.HP -= damageValue;
             SoundManager.Instance.SetSoundEffect(Random.Range(12,15), transform.position);
             if (Boss_stat.HP <= (Boss_stat.MaxHP) * 0.3f)
+            {
+                count++;
                 movepower = 3f;
-            if (attackCool <= 3.5f)
+                Boss_stat.Att = 500;
+                Boss_stat.Def = 300;
+                if (count == 1)
+                {
+                    anim.SetTrigger("Boss_NextPhase");
+                    StartCoroutine(WaitNextPhase());
+                }
+               
+            }
+
+            if ((attackCool <= 2f && isPhase2) || (attackCool <= 3.5f && isPhase2 == false))
                 anim.SetTrigger("Boss_HIt");
             HPBar.value = Boss_stat.HP;
             Debug.Log("보스몬스터 체력 : " + Boss_stat.HP + " / " + Boss_stat.MaxHP);
@@ -295,6 +325,14 @@ public class Boss : MonoBehaviour, AllInterface.IHit
         //    Debug.Log("죽음");
         //    Die();
         //}
+    }
+
+    IEnumerator WaitNextPhase()
+    {
+        isNextPhase = true;
+        yield return new WaitForSeconds(0.75f);
+        isNextPhase = false;
+
     }
 
     void Die()

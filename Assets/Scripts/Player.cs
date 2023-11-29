@@ -378,9 +378,9 @@ public class Player : MonoBehaviour, AllInterface.IHit
     {
         if (isAlive)
         {
-            float damageVal = damage - myStat.Def;
-            if (damageVal > 0f)
-                myStat.HP = Mathf.Clamp(myStat.HP - damageVal, 0, myStat.MaxHP);
+            float damageVal;
+            damageVal = Mathf.Clamp(damage - myStat.Def, 0, Mathf.Infinity);
+            myStat.HP = Mathf.Clamp(myStat.HP - damageVal, 0, myStat.MaxHP);
 
             if (pos != Vector2.zero)
             {

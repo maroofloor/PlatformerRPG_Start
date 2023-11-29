@@ -68,6 +68,11 @@ public class GameManager : Singleton<GameManager>
                 case AllEnum.EnforceType.Attack:
                     for (int i = 0; i < enforceAtt.Length; i++)
                     {
+                        if (player.myStat.Att == enforceAtt[10])
+                        {
+                            UIManager.Instance.PrintWarningMsg("이미 최대강화 상태입니다.");
+                            return;
+                        }
                         if (player.myStat.Att < enforceAtt[i] && i != 0)
                         {
                             player.myStat.Att = enforceAtt[i];
@@ -82,6 +87,11 @@ public class GameManager : Singleton<GameManager>
                 case AllEnum.EnforceType.Defense:
                     for (int i = 0; i < enforceDef.Length; i++)
                     {
+                        if (player.myStat.Def == enforceDef[10])
+                        {
+                            UIManager.Instance.PrintWarningMsg("이미 최대강화 상태입니다.");
+                            return;
+                        }
                         if (player.myStat.Def < enforceDef[i] && i != 0)
                         {
                             player.myStat.Def = enforceDef[i];
@@ -96,6 +106,11 @@ public class GameManager : Singleton<GameManager>
                 case AllEnum.EnforceType.MaxHP:
                     for (int i = 0; i < enforceHP.Length; i++)
                     {
+                        if (player.myStat.MaxHP == enforceHP[10])
+                        {
+                            UIManager.Instance.PrintWarningMsg("이미 최대강화 상태입니다.");
+                            return;
+                        }
                         if (player.myStat.MaxHP < enforceHP[i] && i != 0)
                         {
                             player.myStat.MaxHP = enforceHP[i];
