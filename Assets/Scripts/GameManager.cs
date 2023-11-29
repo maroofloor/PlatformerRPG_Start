@@ -45,6 +45,8 @@ public class GameManager : Singleton<GameManager>
         clearTxt.color = clearTxtColor;
         reviveBut.gameObject.SetActive(false);
         gameOverTr.gameObject.SetActive(false);
+        RollCoolImg.gameObject.SetActive(false);
+        SkillCoolImg.gameObject.SetActive(false);
     }
     void Update()
     {

@@ -15,6 +15,12 @@ public class Portal : MonoBehaviour
         OnPotral = false;
     }
 
+    public void TryPortal()
+    {
+        if (OnPotral)
+            UIManager.Instance.PrintPortalInfo();
+    }
+
     public void PortalYes()
     {
         GameManager.Instance.player.transform.position = portalPosTr.position;
@@ -23,14 +29,6 @@ public class Portal : MonoBehaviour
     public void PortalNo()
     {
         UIManager.Instance.PrintPortalInfo();
-    }
-
-    void Update()
-    {
-        if (OnPotral && Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            UIManager.Instance.PrintPortalInfo();
-        }
     }
 
     void OnTriggerEnter2D(Collider2D collision)

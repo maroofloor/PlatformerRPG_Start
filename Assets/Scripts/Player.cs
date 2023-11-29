@@ -129,6 +129,7 @@ public class Player : MonoBehaviour, AllInterface.IHit
         killCount = 0;
         Life = 3;
         skillCool = 0f;
+        playerSkill.gameObject.SetActive(false);
     }
 
     public void Jump()

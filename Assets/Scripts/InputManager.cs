@@ -22,6 +22,8 @@ public class InputManager : MonoBehaviour
     Player player;
     [SerializeField]
     Transform MobileControllerTr;
+    [SerializeField]
+    Portal portal;
     public Vector3 dir = Vector3.zero;
     public Vector3 joyDir = Vector3.zero;
 
@@ -45,6 +47,8 @@ public class InputManager : MonoBehaviour
             if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
                 player.vec.x = Input.GetAxisRaw("Horizontal");
 
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+                portal.TryPortal();
             if (Input.GetKeyDown(KeyCode.S))
                 GameManager.Instance.player.Skill();
             if (Input.GetKeyDown(KeyCode.C))
