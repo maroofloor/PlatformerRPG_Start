@@ -102,7 +102,7 @@ public class Boss : MonoBehaviour, AllInterface.IHit
                 anim.SetBool("Boss_Walk", ismove);
             }
 
-            if (Input.GetKeyDown(KeyCode.A))
+            if (Input.GetKeyDown(KeyCode.Q))
                 Hit(10000, transform.position);
         }
     }

@@ -57,7 +57,7 @@ public class InputManager : MonoBehaviour
                 player.Attack();
             if (Input.GetKeyDown(KeyCode.X))
                 player.Roll();
-            if (Input.GetKeyDown(KeyCode.Q))
+            if (Input.GetKeyDown(KeyCode.A))
                 player.UsePotion();
             if (Input.GetKeyDown(KeyCode.B))
                 UIManager.Instance.UI_EnforceBotton();
