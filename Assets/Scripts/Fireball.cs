@@ -22,7 +22,7 @@ public class Fireball : Singleton<Fireball>
 
         for (int i = 0; i < max; i++)
         {
-            GameObject tmp = Instantiate(Trap);
+            GameObject tmp = Instantiate(Trap, transform);
             tmp.gameObject.SetActive(false);
             TrapQueue.Enqueue(tmp);
         }

@@ -27,7 +27,7 @@ public class Monster : MonoBehaviour, AllInterface.IHit
 
     Vector2 e_attack = Vector2.zero;
     RaycastHit2D frontperception;
-    RaycastHit2D backperception;
+    //RaycastHit2D backperception;
 
     Coroutine cor = null;
     bool isDetect;
@@ -323,6 +323,7 @@ public class Monster : MonoBehaviour, AllInterface.IHit
         rigid.gravityScale = 1;
         transform.GetChild(0).gameObject.SetActive(true);
         isDetect = false;
+        frontperception = Physics2D.Raycast(e_attack, isRight ? Vector3.right : Vector3.left, 1, LayerMask.GetMask("Player"));
     }
 
     void Die()

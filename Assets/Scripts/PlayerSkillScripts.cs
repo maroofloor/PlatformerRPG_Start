@@ -14,6 +14,17 @@ public class PlayerSkillScripts : MonoBehaviour
 
     Coroutine cor = null;
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Enemy"))
+        {
+            if (collision.transform.TryGetComponent<Boss>(out Boss boss))
+                boss.Hit(player.myStat.Att * 2, player.transform.position);
+            else
+                collision.GetComponent<Monster>().Hit(player.myStat.Att * 2, player.transform.position);
+        }
+    }
+
     public void SetInfo()
     {
         shotDir = player.GetIsLeft() ? Vector2.left : Vector2.right;
@@ -31,6 +42,7 @@ public class PlayerSkillScripts : MonoBehaviour
 
     IEnumerator ShotSkill()
     {
+        SoundManager.Instance.SetSoundEffect(16, transform.position);
         float Distance = Vector2.Distance(startPos, transform.position); ;
         while (Distance < 5f)
         {

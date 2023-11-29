@@ -90,7 +90,7 @@ void Update()
 
 public void killCountUpdate()
 {
-    killCountTxt.text = "Kill : " + string.Format("{0:000}", player.GetKillCount());
+    killCountTxt.text = "Point : " + string.Format("{0:000}", player.GetKillCount());
 }
 
 public void PotionNumUpdate()

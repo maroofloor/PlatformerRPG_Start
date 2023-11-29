@@ -17,7 +17,14 @@ public class HeatArea : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             UIManager.Instance.PrintWarningMsg("열기로 인해 지속적인 피해를 입습니다.");
+            SoundManager.Instance.SetSoundBGM(1);
         }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+            SoundManager.Instance.SetSoundBGM(0);
     }
 
     private void OnTriggerStay2D(Collider2D collision)
